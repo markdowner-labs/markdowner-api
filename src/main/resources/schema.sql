@@ -1,0 +1,1 @@
+select 'schema say: hello world!';
