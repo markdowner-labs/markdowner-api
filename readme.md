@@ -1,28 +1,40 @@
-# Ambiente de Desenvolvimento
+# Documentação
 
+## Baixa Todas as Dependências e Plugins Necessários
 ```bash
-SUBNET_CONFIG=10.0.0.0/24 \
-POSTGRES_IPV4=10.0.0.10 \
-POSTGRES_PORT=5432 \
-POSTGRES_USER=postgres \
-POSTGRES_PASSWORD=123456 \
-POSTGRES_DB=markdowner-db \
-PGADMIN_IPV4=10.0.0.15 \
-PGADMIN_PORT=15432 \
-PGADMIN_DEFAULT_EMAIL=admin@local.host \
-PGADMIN_DEFAULT_PASSWORD=123456 \
-SPRINGBOOT_IPV4=10.0.0.20 \
-SPRINGBOOT_PORT=8080 \
-DATASOURCE_USERNAME=$POSTGRES_USER \
-DATASOURCE_PASSWORD=$POSTGRES_PASSWORD \
-DATASOURCE_URL=jdbc:postgresql://$POSTGRES_IPV4:$POSTGRES_PORT/$POSTGRES_DB \
+mvn dependency:go-offline -B
+```
+- `mvn dependency:go-offline` é uma goal do plugin de dependências do Maven que força o Maven a baixar **todas as dependências e plugins** do projeto **antes** da compilação ou execução, preparando o projeto para ser executado **offline** depois, ou seja, sem precisar baixar nada da internet durante as próximas execuções.
+- O `-B` (batch mode) faz o Maven rodar em modo não interativo, ideal para CI/CD e scripts automatizados, pois evita prompts que esperam interação do usuário.
+
+
+## Efetua uma Construção Limpa Pulando Todos os Testes
+```bash
+mvn clean package -DskipTests
+```
+- `clean`: Apaga a pasta `target` do projeto, onde ficam os arquivos compilados e gerados (como os JARs/WARs). Ou seja, limpa os artefatos da build anterior para começar do zero.
+- `package`: Compila o código, roda os testes (a menos que estejam pulados) e empacota o projeto no formato configurado (por exemplo, gera um arquivo `.jar` ou `.war` na pasta `target`).
+- `-DskipTests`: É uma propriedade que instrui o Maven a **não executar os testes** durante a fase de build. O código será compilado e o pacote gerado, mas os testes não serão rodados.
+
+
+## Inicia o Ambiente Docker Sem Bloquear o Terminal
+```bash
 docker compose up -d
 ```
+- `docker compose up`: sobe (inicia) todos os containers definidos no arquivo `docker-compose.yml`. Ele cria e inicia os serviços, redes e volumes definidos.
+- `-d` **(detached mode)**: executa os containers em segundo plano (modo "desanexado"), ou seja, o terminal fica livre para você continuar usando enquanto os containers rodam em background.
 
-## Observando Logs do SpringBoot
+
+## Conecta o Terminal ao Processo em Execução Dentro do Container
 ```bash
 docker attach springboot
 ```
+- Ele conecta seu terminal **ao processo em execução dentro do container** chamado `springboot`.
+- Ou seja, você passa a ver a saída (logs) do container diretamente no seu terminal, como se estivesse "dentro" do container.
+- Também permite enviar sinais para o processo principal (por exemplo, `CTRL+C` será enviado para o processo dentro do container).
 
-### Notas
-O DevTools está integrado a imagem docker, ou seja, atualizações em arquivos vão refletir na execução da imagem em tempo real.
+
+### Atenção
+- Se você sair do `attach` com `CTRL+C`, pode parar o container (porque o sinal é enviado para o processo).
+- Para sair do attach sem parar o container, use a combinação de teclas:
+`CTRL+P` seguido de `CTRL+Q`.
