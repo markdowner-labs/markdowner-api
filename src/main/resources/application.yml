@@ -19,5 +19,7 @@ spring:
     properties:
       hibernate:
         '[format_sql]': true
+        hbm2ddl:
+          '[import_files]': migration.sql
     hibernate:
       ddl-auto: ${DDL_AUTO}
