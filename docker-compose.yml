@@ -49,7 +49,6 @@ services:
       DDL_AUTO: ${DDL_AUTO}
     volumes:
       - ./:/app
-      - ~/.m2:/root/.m2
     working_dir: /app
     stdin_open: true
     tty: true
