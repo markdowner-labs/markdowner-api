@@ -1,1 +1,0 @@
-select 'data say: hello world!';

@@ -25,16 +25,13 @@ docker compose up -d
 - `-d` **(detached mode)**: executa os containers em segundo plano (modo "desanexado"), ou seja, o terminal fica livre para você continuar usando enquanto os containers rodam em background.
 
 
-## Conecta o Terminal ao Processo em Execução Dentro do Container
+## Executa um Comando Interativo Dentro de um Container em Execução
 ```bash
-docker attach springboot
+docker exec -it springboot bash
 ```
-- Ele conecta seu terminal **ao processo em execução dentro do container** chamado `springboot`.
-- Ou seja, você passa a ver a saída (logs) do container diretamente no seu terminal, como se estivesse "dentro" do container.
-- Também permite enviar sinais para o processo principal (por exemplo, `CTRL+C` será enviado para o processo dentro do container).
-
-
-### Atenção
-- Se você sair do `attach` com `CTRL+C`, pode parar o container (porque o sinal é enviado para o processo).
-- Para sair do attach sem parar o container, use a combinação de teclas:
-`CTRL+P` seguido de `CTRL+Q`.
+- O comando `docker exec` é usado para **executar um comando em um container que já está em execução.**
+- `-i` (ou `--interactive`) mantém o **stdin aberto**, mesmo que não esteja conectado. Isso é crucial para interagir com o processo dentro do container.
+- `-t` (ou `--tty`) **aloca um pseudo-TTY** (terminal). Isso é necessário para ter uma interface de linha de comando interativa.
+- Juntos, `-it` permitem que você se conecte e interaja com um shell (como `bash`) dentro do container, como se estivesse acessando uma máquina virtual.
+- `springboot` é o **nome ou ID do container** no qual você deseja executar o comando.
+- `bash` é o **comando que será executado dentro do container**. Neste caso, inicia um shell Bash, permitindo que você execute outros comandos dentro do ambiente do container.

@@ -7,7 +7,6 @@ spring:
     init:
       mode: always
       schema-locations: classpath:schema.sql
-      data-locations: classpath:data.sql
       encoding: UTF-8
   datasource:
     username: ${DATASOURCE_USERNAME}
@@ -20,6 +19,6 @@ spring:
       hibernate:
         '[format_sql]': true
         hbm2ddl:
-          '[import_files]': migration.sql
+          '[import_files]': migration.sql,settlement.sql
     hibernate:
       ddl-auto: ${DDL_AUTO}
