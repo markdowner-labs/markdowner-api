@@ -135,4 +135,26 @@ public class ProfileRepositoryTest {
                         .password("$2a$10$7Z0zPEtZklljGNH8JHcnRO0pOZAVlBH36Fg7QO9N1LD4thimBL.TW").build()));
     }
 
+    @Test
+    @DisplayName("deve buscar nomes por ordem alfabética")
+    public void notFound_findByNameContainingIgnoreCaseTest() {
+        assertThat(repository.findByNameContainingIgnoreCase(10, "listrange")).isEmpty();
+    }
+
+    @Test
+    @DisplayName("deve buscar nomes por ordem alfabética")
+    public void foundIgnoreCase_findByNameContainingIgnoreCaseTest() {
+        final var result = List.of(Profile.builder()
+                .id(UUID.fromString("019926b9-1561-7000-6090-c113559eb471"))
+                .name("Diana Fernandes")
+                .description("Especialista em e-commerce e vendas.")
+                .birthday(LocalDate.of(1995, 4, 13))
+                .email("diana@example.com")
+                .password("$2a$10$7Z0zPEtZklljGNH8JHcnRO0pOZAVlBH36Fg7QO9N1LD4thimBL.TW").build());
+        assertThat(repository.findByNameContainingIgnoreCase(10, "Fernandes")).isEqualTo(result);
+        assertThat(repository.findByNameContainingIgnoreCase(10, "fernandes")).isEqualTo(result);
+        assertThat(repository.findByNameContainingIgnoreCase(10, "FERNANDES")).isEqualTo(result);
+        assertThat(repository.findByNameContainingIgnoreCase(10, "fernandeS")).isEqualTo(result);
+    }
+
 }
