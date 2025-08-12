@@ -28,7 +28,7 @@ public class ProfileRepositoryTest {
     @DisplayName("deve encontrar um perfil através do email")
     public void shouldFindProfileByEmailTest() {
         final var builder = Profile.builder()
-                .id(UUID.fromString("0198a123-c0a1-72e4-bf8a-64d91516778e"))
+                .id(UUID.fromString("0198a0d3-bd61-7000-9b88-50cc3638e965"))
                 .name("Bruno Borges")
                 .description("Apaixonado por tecnologia e música.")
                 .birthday(LocalDate.of(1992, 04, 23))
