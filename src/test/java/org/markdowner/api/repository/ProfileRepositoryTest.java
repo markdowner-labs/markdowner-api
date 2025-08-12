@@ -20,14 +20,20 @@ public class ProfileRepositoryTest {
     private ProfileRepository repository;
 
     @Test
-    @DisplayName("não deve encontrar um perfil através do email")
-    public void found_findByEmailTest() {
+    @DisplayName("não deve encontrar nenhum email idêntico")
+    public void notFound_findByEmailTest() {
         assertThat(repository.findByEmail("not_found@example.org")).isNotPresent();
     }
 
     @Test
-    @DisplayName("deve encontrar todos os perfis do settlement.sql pelo email")
-    public void notFound_findByEmailTest() {
+    @DisplayName("não deve encontrar nenhum email similar")
+    public void notFoundSameEmail_findByEmailTest() {
+        assertThat(repository.findByEmail("Alice@example.com")).isNotPresent();
+    }
+
+    @Test
+    @DisplayName("deve encontrar 1 email idêntico")
+    public void foundEqualEmail_findByEmailTest() {
         assertThat(repository.findByEmail("alice@example.com")).isEqualTo(Optional.of(Profile.builder()
                 .id(UUID.fromString("01989bad-6161-7000-0ae9-f440b10578ec"))
                 .name("Alice Alves")
@@ -38,8 +44,8 @@ public class ProfileRepositoryTest {
     }
 
     @Test
-    @DisplayName("deve buscar nomes por ordem alfabética")
-    public void foundLimit10_findByNameContainingIgnoreCaseTest() {
+    @DisplayName("deve encontrar 6 nomes similares por ordem alfabética")
+    public void foundLimit6_findByNameContainingIgnoreCaseTest() {
         assertThat(repository.findByNameContainingIgnoreCase(6, "ana")).isEqualTo(List.of(
                 Profile.builder()
                         .id(UUID.fromString("019b248e-a961-7000-233d-b99937ef11d4"))
@@ -86,7 +92,7 @@ public class ProfileRepositoryTest {
     }
 
     @Test
-    @DisplayName("deve buscar nomes por ordem alfabética")
+    @DisplayName("deve encontrar 2 nomes similares por ordem alfabética")
     public void foundLimit02_findByNameContainingIgnoreCaseTest() {
         assertThat(repository.findByNameContainingIgnoreCase(2, "ana")).isEqualTo(List.of(
                 Profile.builder()
@@ -136,13 +142,7 @@ public class ProfileRepositoryTest {
     }
 
     @Test
-    @DisplayName("deve buscar nomes por ordem alfabética")
-    public void notFound_findByNameContainingIgnoreCaseTest() {
-        assertThat(repository.findByNameContainingIgnoreCase(10, "listrange")).isEmpty();
-    }
-
-    @Test
-    @DisplayName("deve buscar nomes por ordem alfabética")
+    @DisplayName("deve encontrar nomes similares em `ignore case`")
     public void foundIgnoreCase_findByNameContainingIgnoreCaseTest() {
         final var result = List.of(Profile.builder()
                 .id(UUID.fromString("019926b9-1561-7000-6090-c113559eb471"))
@@ -155,6 +155,15 @@ public class ProfileRepositoryTest {
         assertThat(repository.findByNameContainingIgnoreCase(10, "fernandes")).isEqualTo(result);
         assertThat(repository.findByNameContainingIgnoreCase(10, "FERNANDES")).isEqualTo(result);
         assertThat(repository.findByNameContainingIgnoreCase(10, "fernandeS")).isEqualTo(result);
+        assertThat(repository.findByNameContainingIgnoreCase(10, " FERNANDES")).isEqualTo(result);
+        assertThat(repository.findByNameContainingIgnoreCase(10, " FERNANDES ")).isEqualTo(result);
+        assertThat(repository.findByNameContainingIgnoreCase(10, "FERNANDES ")).isEqualTo(result);
+    }
+
+    @Test
+    @DisplayName("deve determinar que o nomes similares não foram encontrados")
+    public void notFound_findByNameContainingIgnoreCaseTest() {
+        assertThat(repository.findByNameContainingIgnoreCase(10, "listrange")).isEmpty();
     }
 
 }

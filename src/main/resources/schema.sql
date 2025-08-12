@@ -8,5 +8,5 @@ RETURNS text
 LANGUAGE sql
 IMMUTABLE
 AS $$
-  SELECT unaccent(lower(normalize(target)))
+  SELECT unaccent(lower(normalize(trim(target))))
 $$;
