@@ -26,7 +26,8 @@ public class ProfileRepositoryTest {
                                 .description("Especialista em segurança de aplicações.")
                                 .birthday(LocalDate.of(1983, 12, 25))
                                 .email("ana.isidoro@example.com")
-                                .password("$2a$10$7Z0zPEtZklljGNH8JHcnRO0pOZAVlBH36Fg7QO9N1LD4thimBL.TW").build();
+                                .password("$2a$10$7Z0zPEtZklljGNH8JHcnRO0pOZAVlBH36Fg7QO9N1LD4thimBL.TW")
+                                .build();
         }
 
         private static final Profile profileDianaFernandes() {
@@ -36,7 +37,8 @@ public class ProfileRepositoryTest {
                                 .description("Especialista em e-commerce e vendas.")
                                 .birthday(LocalDate.of(1995, 4, 13))
                                 .email("diana@example.com")
-                                .password("$2a$10$7Z0zPEtZklljGNH8JHcnRO0pOZAVlBH36Fg7QO9N1LD4thimBL.TW").build();
+                                .password("$2a$10$7Z0zPEtZklljGNH8JHcnRO0pOZAVlBH36Fg7QO9N1LD4thimBL.TW")
+                                .build();
         }
 
         private static final Profile profileJulianaRios() {
@@ -46,7 +48,8 @@ public class ProfileRepositoryTest {
                                 .description("Estudante de engenharia de dados.")
                                 .birthday(LocalDate.of(2000, 2, 9))
                                 .email("juliana.rios@example.com")
-                                .password("$2a$10$7Z0zPEtZklljGNH8JHcnRO0pOZAVlBH36Fg7QO9N1LD4thimBL.TW").build();
+                                .password("$2a$10$7Z0zPEtZklljGNH8JHcnRO0pOZAVlBH36Fg7QO9N1LD4thimBL.TW")
+                                .build();
         }
 
         private static final Profile profileMarianaPaz() {
@@ -56,7 +59,8 @@ public class ProfileRepositoryTest {
                                 .description("Estudante de engenharia de dados.")
                                 .birthday(LocalDate.of(2000, 12, 1))
                                 .email("mariana.paz@example.com")
-                                .password("$2a$10$7Z0zPEtZklljGNH8JHcnRO0pOZAVlBH36Fg7QO9N1LD4thimBL.TW").build();
+                                .password("$2a$10$7Z0zPEtZklljGNH8JHcnRO0pOZAVlBH36Fg7QO9N1LD4thimBL.TW")
+                                .build();
         }
 
         private static final Profile profileRenataYamanaka() {
@@ -66,7 +70,8 @@ public class ProfileRepositoryTest {
                                 .description("Analista de dados e ciência de dados.")
                                 .birthday(LocalDate.of(1994, 5, 16))
                                 .email("renata.yamanaka@example.com")
-                                .password("$2a$10$7Z0zPEtZklljGNH8JHcnRO0pOZAVlBH36Fg7QO9N1LD4thimBL.TW").build();
+                                .password("$2a$10$7Z0zPEtZklljGNH8JHcnRO0pOZAVlBH36Fg7QO9N1LD4thimBL.TW")
+                                .build();
         }
 
         private static final Profile profileVitorViana() {
@@ -76,7 +81,8 @@ public class ProfileRepositoryTest {
                                 .description("Consultor financeiro e investidor.")
                                 .birthday(LocalDate.of(1982, 10, 11))
                                 .email("vitor.viana@example.com")
-                                .password("$2a$10$7Z0zPEtZklljGNH8JHcnRO0pOZAVlBH36Fg7QO9N1LD4thimBL.TW").build();
+                                .password("$2a$10$7Z0zPEtZklljGNH8JHcnRO0pOZAVlBH36Fg7QO9N1LD4thimBL.TW")
+                                .build();
         }
 
         @Test
@@ -128,21 +134,23 @@ public class ProfileRepositoryTest {
         @Test
         @DisplayName("deve encontrar 2 nomes similares por ordem alfabética")
         public void foundLimit02_findByNameContainingIgnoreCaseTest() {
+                final var limit = 2;
+                final var searchTerm = "ana";
                 // given
                 final var givenStepsOne = List.of(profileAnaIsidoro(), profileDianaFernandes());
                 final var givenStepsTwo = List.of(profileJulianaRios(), profileMarianaPaz());
                 final var givenStepsTree = List.of(profileRenataYamanaka(), profileVitorViana());
                 // when
-                final var whenStepsOne = repository.findByNameContainingIgnoreCase(2, "ana");
+                final var whenStepsOne = repository.findByNameContainingIgnoreCase(limit, searchTerm);
                 final var whenStepsTwo = repository.findByNameContainingIgnoreCase(
-                                2, "Diana Fernandes",
+                                limit, "Diana Fernandes",
                                 UUID.fromString("019926b9-1561-7000-6090-c113559eb471"),
-                                "ana");
+                                searchTerm);
                 final var whenStepsTree = repository.findByNameContainingIgnoreCase(
-                                2,
+                                limit,
                                 "Mariana Paz",
                                 UUID.fromString("0199d5d1-4d61-7000-18f0-9689e06c1745"),
-                                "ana");
+                                searchTerm);
                 // then
                 assertThat(whenStepsOne).isEqualTo(givenStepsOne);
                 assertThat(whenStepsTwo).isEqualTo(givenStepsTwo);
@@ -152,16 +160,17 @@ public class ProfileRepositoryTest {
         @Test
         @DisplayName("deve encontrar nomes similares em `ignore case`")
         public void foundIgnoreCase_findByNameContainingIgnoreCaseTest() {
+                final var limit = 10;
                 // given
                 final var given = List.of(profileDianaFernandes());
                 // when
-                final var whenStartUpperCase = repository.findByNameContainingIgnoreCase(10, "Fernandes");
-                final var whenFullLowerCase = repository.findByNameContainingIgnoreCase(10, "fernandes");
-                final var whenFullUpperCase = repository.findByNameContainingIgnoreCase(10, "FERNANDES");
-                final var whenEndUpperCase = repository.findByNameContainingIgnoreCase(10, "fernandeS");
-                final var whenStartSpace = repository.findByNameContainingIgnoreCase(10, " FERNANDES");
-                final var whenEnterSpace = repository.findByNameContainingIgnoreCase(10, " FERNANDES ");
-                final var whenEndSpace = repository.findByNameContainingIgnoreCase(10, "FERNANDES ");
+                final var whenStartUpperCase = repository.findByNameContainingIgnoreCase(limit, "Fernandes");
+                final var whenFullLowerCase = repository.findByNameContainingIgnoreCase(limit, "fernandes");
+                final var whenFullUpperCase = repository.findByNameContainingIgnoreCase(limit, "FERNANDES");
+                final var whenEndUpperCase = repository.findByNameContainingIgnoreCase(limit, "fernandeS");
+                final var whenStartSpace = repository.findByNameContainingIgnoreCase(limit, " FERNANDES");
+                final var whenEnterSpace = repository.findByNameContainingIgnoreCase(limit, " FERNANDES ");
+                final var whenEndSpace = repository.findByNameContainingIgnoreCase(limit, "FERNANDES ");
                 // then
                 assertThat(whenStartUpperCase).isEqualTo(given);
                 assertThat(whenFullLowerCase).isEqualTo(given);
@@ -176,10 +185,65 @@ public class ProfileRepositoryTest {
         @DisplayName("deve determinar que o nomes similares não foram encontrados")
         public void notFound_findByNameContainingIgnoreCaseTest() {
                 // when
-                final var whenFindByNameContainingIgnoreCase = repository.findByNameContainingIgnoreCase(10,
+                final var whenFindByNameContainingIgnoreCase = repository.findByNameContainingIgnoreCase(
+                                10,
                                 "listrange");
                 // then
                 assertThat(whenFindByNameContainingIgnoreCase).isEmpty();
+        }
+
+        @Test
+        @DisplayName("deve encontrar uma sequência de nomes iguais uns aos outros")
+        public void foundEqualsSequenceName_findByNameContainingIgnoreCaseTest() {
+                final var limit = 2;
+                final var searchTerm = "Ícaro Queiroz";
+                final var lastSeenName = searchTerm;
+                final var builder = Profile
+                                .builder()
+                                .name("Ícaro Queiroz")
+                                .description("Gerente de projetos de software.")
+                                .birthday(LocalDate.of(1980, 06, 16))
+                                .password("$2a$10$7Z0zPEtZklljGNH8JHcnRO0pOZAVlBH36Fg7QO9N1LD4thimBL.TW");
+                // given
+                final var givenStepsOne = builder
+                                .id(UUID.fromString("019b3928-1961-7000-8291-81abacac2031"))
+                                .email("icaro.queiroz4@example.com")
+                                .build();
+                final var givenStepsTwo = builder
+                                .id(UUID.fromString("019b3e4e-7561-7000-08a3-ee595001af07"))
+                                .email("icaro.queiroz3@example.com")
+                                .build();
+                final var givenStepsTree = builder
+                                .id(UUID.fromString("019b4374-d161-7000-b34e-ae5170c4149d"))
+                                .email("icaro.queiroz2@example.com")
+                                .build();
+                final var givenStepsFour = builder
+                                .id(UUID.fromString("019b489b-2d61-7000-d755-207f0f2a1824"))
+                                .email("icaro.queiroz1@example.com")
+                                .build();
+                final var givenStepsFive = builder
+                                .id(UUID.fromString("019b4dc1-8961-7000-1fdf-212992682387"))
+                                .email("icaro.queiroz0@example.com")
+                                .build();
+                // when
+                UUID lastSeenId;
+                final var whenStepsOne = repository.findByNameContainingIgnoreCase(limit, searchTerm);
+                lastSeenId = UUID.fromString("019b3e4e-7561-7000-08a3-ee595001af07");
+                final var whenStepsTwo = repository.findByNameContainingIgnoreCase(
+                                limit,
+                                lastSeenName,
+                                lastSeenId,
+                                searchTerm);
+                lastSeenId = UUID.fromString("019b489b-2d61-7000-d755-207f0f2a1824");
+                final var whenStepsTree = repository.findByNameContainingIgnoreCase(
+                                limit,
+                                lastSeenName,
+                                lastSeenId,
+                                searchTerm);
+                // then
+                assertThat(whenStepsOne).isEqualTo(List.of(givenStepsOne, givenStepsTwo));
+                assertThat(whenStepsTwo).isEqualTo(List.of(givenStepsTree, givenStepsFour));
+                assertThat(whenStepsTree).isEqualTo(List.of(givenStepsFive));
         }
 
 }
