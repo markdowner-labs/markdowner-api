@@ -11,12 +11,12 @@ import java.lang.annotation.Target;
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Payload;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 
-@Size(max = Email.MAX_SIZE, message = "o comprimento deve ser menor ou igual a " + Email.MAX_SIZE)
+@NotNull(message = "must not be null email address")
 @jakarta.validation.constraints.Email(regexp = "^[a-z0-9._%+-]+@(?![.-])[a-z0-9.-]*[a-z0-9](?<!-)(?<!\\.)\\.[a-z]{2,}$")
 @Constraint(validatedBy = {})
 @Target({ ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.ANNOTATION_TYPE })
