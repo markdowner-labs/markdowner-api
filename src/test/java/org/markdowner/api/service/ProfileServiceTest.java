@@ -123,7 +123,17 @@ public class ProfileServiceTest {
                 final var validations = assertThrows(ConstraintViolationException.class, () -> {
                         service.findByEmail(email);
                 }).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
-                final var expected = List.of("deve ser um email válido.");
+                final var expected = List.of("must be a well-formed email address");
+                assertThat(validations).isEqualTo(expected);
+        }
+
+        @Test
+        @DisplayName("Validação do campo Email - casos em branco ou nulo")
+        public void shouldRejectBlankAndNullEmailsTest() {
+                final var validations = assertThrows(ConstraintViolationException.class, () -> {
+                        service.findByEmail("");
+                }).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                final var expected = List.of("must be a well-formed email address");
                 assertThat(validations).isEqualTo(expected);
         }
 
