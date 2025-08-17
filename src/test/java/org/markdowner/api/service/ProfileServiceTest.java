@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +28,12 @@ public class ProfileServiceTest {
 
         @Autowired
         private ProfileService service;
+
+        private static Stream<Arguments> invalidLimitProvider() {
+                return Stream.of(
+                                Arguments.of("Limit: limite de paginação negativo", -1),
+                                Arguments.of("Limit: limite de paginação zero", 0));
+        }
 
         private static Stream<Arguments> invalidEmailProvider() {
                 return Stream.of(
@@ -55,15 +62,41 @@ public class ProfileServiceTest {
                                                 "rprsgefxrayrpaydsncgdxpsnhwpryazfrrbjzkugvqimfidwpcjiyapipyvrehko@example.com"));
         }
 
+        private static Stream<Arguments> invalidNameProvider() {
+                return Stream.of(
+                                Arguments.of("Nome: número no valor", "João123"),
+                                Arguments.of("Nome: caractere inválido '!'", "Maria!"),
+                                Arguments.of("Nome: caractere inválido '@'", "José@Silva"),
+                                Arguments.of("Nome: caractere inválido '_'", "Ana_Souza"),
+                                Arguments.of("Nome: espaço no início", " João"),
+                                Arguments.of("Nome: espaço no final", "Maria "),
+                                Arguments.of("Nome: dois espaços consecutivos", "João  Silva"),
+                                Arguments.of("Nome: dois hífens consecutivos", "Ana--Clara"),
+                                Arguments.of("Nome: dois apóstrofos consecutivos", "O''Neill"),
+                                Arguments.of("Nome: hífen no final", "Pedro-"),
+                                Arguments.of("Nome: apóstrofo no final", "Luiz'"),
+                                Arguments.of("Nome: espaço no final", "Ana "),
+                                Arguments.of("Nome: string vazia", ""),
+                                Arguments.of("Nome: apenas espaço", " "),
+                                Arguments.of("Nome: apenas hífen", "-"),
+                                Arguments.of("Nome: apenas apóstrofo", "'"),
+                                Arguments.of("Nome: letra fora do intervalo permitido (estilizada)", "𝓙𝓸𝓼é"),
+                                Arguments.of("Nome: letra fora do intervalo permitido (turca)", "İlker"),
+                                Arguments.of("Nome: letra fora do intervalo permitido (polonesa)", "Łukasz"),
+                                Arguments.of("Nome: ponto antes de leta", ".Pedro Alvares Cabral"),
+                                Arguments.of("Nome: ponto entre espaços", "Pedro . Alvares Cabral"),
+                                Arguments.of("Nome: ponto após espaço", "Pedro .Alvares Cabral"));
+        }
+
         @ParameterizedTest(name = "{0}")
         @MethodSource("invalidEmailProvider")
         @DisplayName("Validação do campo Email - casos inválidos")
-        public void shouldRejectInvalidEmailsTest(String description, String email) {
+        public void shouldRejectInvalidEmailsTest(final String description, final String email) {
                 final var validations = assertThrows(ConstraintViolationException.class, () -> {
                         service.findByEmail(email);
-                }).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 final var expected = List.of("must be a well-formed email address");
-                assertThat(validations).isEqualTo(expected);
+                assertThat(validations).isEqualTo(expected).as(description);
         }
 
         @Test
@@ -76,4 +109,80 @@ public class ProfileServiceTest {
                 assertThat(validations).isEqualTo(expected);
         }
 
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("invalidNameProvider")
+        @DisplayName("Validação do campo Nome - casos inválidos")
+        public void shouldRejectInvalidNamesTest(final String description, final String name) {
+                final var validations = assertThrows(ConstraintViolationException.class, () -> {
+                        service.findByNameContainingIgnoreCase(1, name, UUID.randomUUID(), "any_name");
+                }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                final var expected = List.of("must be a well-formed name");
+                assertThat(validations).isEqualTo(expected).as(description);
+        }
+
+        @Test
+        @DisplayName("Validação do campo lastSeenName - caso onde o nome é longo de mais")
+        public void shouldRejectOverSizeName() {
+                final var longSizeName = "um nome longo demais para ser aceito";
+                final var validations = assertThrows(ConstraintViolationException.class, () -> {
+                        service.findByNameContainingIgnoreCase(1, longSizeName, UUID.randomUUID(), "any_name");
+                }).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                final var expected = List.of("size must contain a maximum of 30 characters");
+                assertThat(validations).isEqualTo(expected).as("o nome é longo de mais para cer aceito");
+        }
+
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("invalidLimitProvider")
+        @DisplayName("Validação do campo limit - caso onde o limite de paginação é zero ou negativo")
+        public void shouldRejectZeroOrNegativeLimit(final String description, final int limit) {
+                var validations = assertThrows(ConstraintViolationException.class, () -> {
+                        service.findByNameContainingIgnoreCase(limit, "P. Alvares Cabral", UUID.randomUUID(), "any_name");
+                }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                final var expected = List.of("must be greater than 0");
+                assertThat(validations).isEqualTo(expected).as(description);
+
+                validations = assertThrows(ConstraintViolationException.class, () -> {
+                        service.findByNameContainingIgnoreCase(limit, "any name");
+                }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                assertThat(validations).isEqualTo(expected).as(description);
+        }
+
+        @Test
+        @DisplayName("Validação do campo lastSeenId - caso o último ID visto seja nulo")
+        public void shouldRejectNullLastSeenId() {
+                final var validations = assertThrows(ConstraintViolationException.class, () -> {
+                        service.findByNameContainingIgnoreCase(1, "Pedro A. Cabral", null, "any_name");
+                }).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                final var expected = List.of("must not be null");
+                assertThat(validations).isEqualTo(expected).as("o último id visto está nulo");
+        }
+
+        @Test
+        @DisplayName("Validação do campo name - caso onde o nome esteja em branco")
+        public void shouldRejectBlankName() {
+                final var description = "o nome em branco";
+                var validations = assertThrows(ConstraintViolationException.class, () -> {
+                        service.findByNameContainingIgnoreCase(1, "Pedro Alvares C.", UUID.randomUUID(), null);
+                }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                final var expected = List.of("must not be blank");
+                assertThat(validations).isEqualTo(expected).as(description);
+
+                validations = assertThrows(ConstraintViolationException.class, () -> {
+                        service.findByNameContainingIgnoreCase(1, null);
+                }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                assertThat(validations).isEqualTo(expected).as(description);
+        }
+
+        @Test
+        @DisplayName("Validação do campo Email - caso nulo")
+        public void shouldRejectNullNamesTest() {
+                final var description = "o nome em branco";
+                var validations = assertThrows(ConstraintViolationException.class, () -> {
+                        service.findByNameContainingIgnoreCase(1, null, UUID.randomUUID(), "any_name");
+                }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                final var expected = List.of("must not be null name");
+                assertThat(validations).isEqualTo(expected).as(description);
+        }
+
 }
+// adicionar validação de método não chamado
