@@ -26,9 +26,9 @@ public @interface Year {
 
     Class<? extends Payload>[] payload() default {};
 
-    int min() default Integer.MIN_VALUE;
+    long min() default Long.MIN_VALUE;
 
-    int max() default Integer.MAX_VALUE;
+    long max() default Long.MAX_VALUE;
 
     boolean nullable() default true;
 

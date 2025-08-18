@@ -23,8 +23,6 @@ import lombok.RequiredArgsConstructor;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Email {
 
-    static final int MAX_SIZE = 100;
-
     String message() default "";
 
     Class<?>[] groups() default {};

@@ -13,8 +13,6 @@ import org.markdowner.api.domain.validation.profile.Password;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,7 +26,6 @@ import lombok.With;
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor(onConstructor_ = @Deprecated)
 @AllArgsConstructor(onConstructor_ = @Deprecated)
-@Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "email" }) })
 @Entity
 public class Profile implements Serializable {
 
@@ -45,6 +42,7 @@ public class Profile implements Serializable {
     private LocalDate birthday;
 
     @Email
+    @Column(length = 76, unique = true)
     private String email;
 
     @Password
