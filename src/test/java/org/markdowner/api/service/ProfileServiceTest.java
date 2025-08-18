@@ -99,18 +99,19 @@ public class ProfileServiceTest {
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 final var expected = List.of("must be a well-formed email address");
                 assertThat(validations).isEqualTo(expected).as(description);
-                verify(repository, never()).findByEmail(email);
+                verify(repository, never().description(description)).findByEmail(email);
         }
 
         @Test
         @DisplayName("Validação do campo Email - caso nulo")
         public void shouldRejectNullEmailsTest() {
+                final var description = "Email: caso nulo";
                 final var validations = assertThrows(ConstraintViolationException.class, () -> {
                         service.findByEmail(null);
-                }).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 final var expected = List.of("must not be null email address");
-                assertThat(validations).isEqualTo(expected);
-                verify(repository, never()).findByEmail(null);
+                assertThat(validations).isEqualTo(expected).as(description);
+                verify(repository, never().description(description)).findByEmail(null);
         }
 
         @ParameterizedTest(name = "{0}")
@@ -122,19 +123,22 @@ public class ProfileServiceTest {
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 final var expected = List.of("must be a well-formed name");
                 assertThat(validations).isEqualTo(expected).as(description);
-                verify(repository, never()).findByNameContainingIgnoreCase(1, name, UUID.randomUUID(), "any_name");
+                verify(repository, never().description(description))
+                                .findByNameContainingIgnoreCase(1, name, UUID.randomUUID(), "any_name");
         }
 
         @Test
         @DisplayName("Validação do campo lastSeenName - caso onde o nome é longo de mais")
         public void shouldRejectOverSizeName() {
+                final var description = "Nome: longo de mais para cer aceito";
                 final var longSizeName = "um nome longo demais para ser aceito";
                 final var validations = assertThrows(ConstraintViolationException.class, () -> {
                         service.findByNameContainingIgnoreCase(1, longSizeName, UUID.randomUUID(), "any_name");
-                }).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 final var expected = List.of("size must contain a maximum of 30 characters");
-                assertThat(validations).isEqualTo(expected).as("o nome é longo de mais para cer aceito");
-                verify(repository, never()).findByNameContainingIgnoreCase(1, longSizeName, UUID.randomUUID(), "any_name");
+                assertThat(validations).isEqualTo(expected).as(description);
+                verify(repository, never().description(description))
+                                .findByNameContainingIgnoreCase(1, longSizeName, UUID.randomUUID(), "any_name");
         }
 
         @ParameterizedTest(name = "{0}")
@@ -146,55 +150,55 @@ public class ProfileServiceTest {
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 final var expected = List.of("must be greater than 0");
                 assertThat(validations).isEqualTo(expected).as(description);
-                verify(repository, never()).findByNameContainingIgnoreCase(limit, "P. Alvares Cabral", UUID.randomUUID(), "any_name");
+                verify(repository, never().description(description)).findByNameContainingIgnoreCase(limit, "P. Alvares Cabral", UUID.randomUUID(), "any_name");
 
                 validations = assertThrows(ConstraintViolationException.class, () -> {
                         service.findByNameContainingIgnoreCase(limit, "any name");
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 assertThat(validations).isEqualTo(expected).as(description);
-                verify(repository, never()).findByNameContainingIgnoreCase(limit, "any name");
+                verify(repository, never().description(description)).findByNameContainingIgnoreCase(limit, "any name");
         }
 
         @Test
         @DisplayName("Validação do campo lastSeenId - caso o último ID visto seja nulo")
         public void shouldRejectNullLastSeenId() {
+                final var description = "lastSeenId: o último id visto está nulo";
                 final var validations = assertThrows(ConstraintViolationException.class, () -> {
                         service.findByNameContainingIgnoreCase(1, "Pedro A. Cabral", null, "any_name");
-                }).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 final var expected = List.of("must not be null");
-                assertThat(validations).isEqualTo(expected).as("o último id visto está nulo");
-                verify(repository, never()).findByNameContainingIgnoreCase(1, "Pedro A. Cabral", null, "any_name");
+                assertThat(validations).isEqualTo(expected).as(description);
+                verify(repository, never().description(description)).findByNameContainingIgnoreCase(1, "Pedro A. Cabral", null, "any_name");
         }
 
         @Test
         @DisplayName("Validação do campo name - caso onde o nome esteja em branco")
         public void shouldRejectBlankName() {
-                final var description = "o nome em branco";
+                final var description = "Nome: está em branco";
                 var validations = assertThrows(ConstraintViolationException.class, () -> {
                         service.findByNameContainingIgnoreCase(1, "Pedro Alvares C.", UUID.randomUUID(), null);
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 final var expected = List.of("must not be blank");
                 assertThat(validations).isEqualTo(expected).as(description);
-                verify(repository, never()).findByNameContainingIgnoreCase(1, "Pedro Alvares C.", UUID.randomUUID(), null);
+                verify(repository, never().description(description)).findByNameContainingIgnoreCase(1, "Pedro Alvares C.", UUID.randomUUID(), null);
 
                 validations = assertThrows(ConstraintViolationException.class, () -> {
                         service.findByNameContainingIgnoreCase(1, null);
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 assertThat(validations).isEqualTo(expected).as(description);
-                verify(repository, never()).findByNameContainingIgnoreCase(1, null);
+                verify(repository, never().description(description)).findByNameContainingIgnoreCase(1, null);
         }
 
         @Test
-        @DisplayName("Validação do campo Email - caso nulo")
+        @DisplayName("Validação do campo Nome - caso nulo")
         public void shouldRejectNullNamesTest() {
-                final var description = "o nome em branco";
+                final var description = "Nome: está nulo";
                 var validations = assertThrows(ConstraintViolationException.class, () -> {
                         service.findByNameContainingIgnoreCase(1, null, UUID.randomUUID(), "any_name");
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 final var expected = List.of("must not be null name");
                 assertThat(validations).isEqualTo(expected).as(description);
-                verify(repository, never()).findByNameContainingIgnoreCase(1, null, UUID.randomUUID(), "any_name");
+                verify(repository, never().description(description)).findByNameContainingIgnoreCase(1, null, UUID.randomUUID(), "any_name");
         }
 
 }
-// melhorar comentários de assert
