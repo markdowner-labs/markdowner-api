@@ -3,9 +3,13 @@ package org.markdowner.api.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -14,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.markdowner.api.domain.model.Profile;
 import org.markdowner.api.repository.ProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,6 +35,17 @@ public class ProfileServiceTest {
 
         @Autowired
         private ProfileService service;
+
+        private static Profile profile() {
+                return Profile.builder()
+                                .id(UUID.fromString("019b248e-a961-7000-233d-b99937ef11d4"))
+                                .name("P. Dias D'Ávila São M.")
+                                .description("Especialista em segurança de aplicações.")
+                                .birthday(LocalDate.of(1983, 12, 25))
+                                .email("anyemail@example.com")
+                                .password("$2a$10$7Z0zPEtZklljGNH8JHcnRO0pOZAVlBH36Fg7QO9N1LD4thimBL.TW")
+                                .build();
+        }
 
         private static Stream<Arguments> invalidLimitProvider() {
                 return Stream.of(
@@ -200,5 +216,30 @@ public class ProfileServiceTest {
                 assertThat(validations).isEqualTo(expected).as(description);
                 verify(repository, never().description(description)).findByNameContainingIgnoreCase(1, null, UUID.randomUUID(), "any_name");
         }
+
+        @Test
+        @DisplayName("Validação do campo email - caso válido")
+        public void shouldAcceptValidFindByEmail() {
+                final var profile = profile();
+                when(repository.findByEmail(profile.getEmail())).thenReturn(Optional.of(profile));
+                assertThat(service.findByEmail(profile.getEmail())).isEqualTo(Optional.of(profile));
+                verify(repository, times(1)).findByEmail(profile.getEmail());
+        }
+
+        @Test
+        @DisplayName("Validação do campo nome - caso válido")
+        public void shouldAcceptValidFindByNameContainingIgnoreCase() {
+                final var profile = profile();
+
+                when(repository.findByNameContainingIgnoreCase(10, profile.getName())).thenReturn(List.of(profile));
+                assertThat(service.findByNameContainingIgnoreCase(10, profile.getName())).isEqualTo(List.of(profile));
+                verify(repository, times(1)).findByNameContainingIgnoreCase(10, profile.getName());
+
+                when(repository.findByNameContainingIgnoreCase(10, profile.getName(), profile.getId(), profile.getName())).thenReturn(List.of(profile));
+                assertThat(service.findByNameContainingIgnoreCase(10, profile.getName(), profile.getId(), profile.getName())).isEqualTo(List.of(profile));
+                verify(repository, times(1)).findByNameContainingIgnoreCase(10, profile.getName(), profile.getId(), profile.getName());
+        }
+
+
 
 }
