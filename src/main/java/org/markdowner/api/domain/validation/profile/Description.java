@@ -10,13 +10,11 @@ import java.lang.annotation.Target;
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Payload;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 
-@NotBlank
 @Size(max = Description.MAX_SIZE, message = "o comprimento deve ser menor ou igual a " + Description.MAX_SIZE)
 @Constraint(validatedBy = {})
 @Target({ ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.ANNOTATION_TYPE })
