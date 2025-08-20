@@ -24,6 +24,16 @@ docker compose up -d
 - `docker compose up`: sobe (inicia) todos os containers definidos no arquivo `docker-compose.yml`. Ele cria e inicia os serviços, redes e volumes definidos.
 - `-d` **(detached mode)**: executa os containers em segundo plano (modo "desanexado"), ou seja, o terminal fica livre para você continuar usando enquanto os containers rodam em background.
 
+**Se as variáveis de ambiente de sua máquina estiverem dando conflito com a instância docker, use o comando abaixo:**
+
+```bash
+env -i docker compose --env-file .env up -d
+```
+- `env -i`: inicia o comando em um ambiente limpo, ou seja, todas as variáveis de ambiente do sistema são ignoradas. Apenas variáveis explicitamente passadas ou de arquivos de ambiente serão consideradas.
+- `--env-file .env`: força o Docker Compose a carregar as variáveis de ambiente definidas no arquivo `.env` especificado, substituindo qualquer valor padrão ou existente no sistema.
+- `docker compose up`: cria e inicia todos os containers, redes e volumes definidos no arquivo `docker-compose.yml`.
+- `-d` (detached mode): executa os containers em segundo plano, permitindo que o terminal continue livre para outros comandos enquanto os containers estão rodando.
+
 
 ## Executa um Comando Interativo Dentro de um Container em Execução
 ```bash
