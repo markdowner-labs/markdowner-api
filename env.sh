@@ -2,7 +2,6 @@
 
 PROFILE="$HOME/.profile"
 
-# Lista de variáveis no formato VAR=valor
 declare -A vars=(
   [POSTGRES_IPV4]="127.0.0.1"
   [POSTGRES_PORT]="5432"
@@ -17,8 +16,6 @@ declare -A vars=(
 
 for key in "${!vars[@]}"; do
   value="${vars[$key]}"
-
-  # Se já existir e for diferente → substitui
   if grep -qE "^export $key=" "$PROFILE"; then
     current_val=$(grep -E "^export $key=" "$PROFILE" | sed -E "s/^export $key=//")
     if [[ "$current_val" != "$value" ]]; then
@@ -26,7 +23,6 @@ for key in "${!vars[@]}"; do
       echo "Updated: $key"
     fi
   else
-    # Se não existir, adiciona
     echo "export $key=$value" >> "$PROFILE"
     echo "Created: $key"
   fi
