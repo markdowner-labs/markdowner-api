@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-ApiApplication<api>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "org.markdowner.api.ApiApplication",
+            "projectName": "api",
+            "args": "-Duser.language=en -Duser.country=US",
+            "envFile": "${workspaceFolder}/.vscode/.env"
+        }
+    ]
+}
