@@ -2,8 +2,11 @@
     "java.compile.nullAnalysis.mode": "automatic",
     "java.configuration.updateBuildConfiguration": "interactive",
     "java.test.config": {
+        "name": "pt-BR",
         "vmArgs": [
-            "-Duser.language=en -Duser.country=US"
+            "-Duser.language=pt",
+            "-Duser.country=BR"
         ]
-    }
+    },
+    "java.test.defaultConfig": "pt-BR"
 }

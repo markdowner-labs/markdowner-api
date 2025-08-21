@@ -7,7 +7,10 @@
             "cwd": "${workspaceFolder}",
             "mainClass": "org.markdowner.api.ApiApplication",
             "projectName": "api",
-            "args": "-Duser.language=en -Duser.country=US"
+            "vmArgs": [
+                "-Duser.language=pt",
+                "-Duser.country=BR"
+            ]
         }
     ]
 }
