@@ -16,7 +16,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 
-@NotNull(message = "must not be null email address")
+@NotNull
 @jakarta.validation.constraints.Email(regexp = "^[a-z0-9._%+-]+@(?![.-])[a-z0-9.-]*[a-z0-9](?<!-)(?<!\\.)\\.[a-z]{2,}$")
 @Constraint(validatedBy = {})
 @Target({ ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.ANNOTATION_TYPE })

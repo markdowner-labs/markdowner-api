@@ -52,7 +52,7 @@ public class NameTest {
         final var validations = assertThrows(ConstraintViolationException.class, () -> {
             Name.Validation.validate(name);
         }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
-        final var expected = List.of("must be a well-formed name");
+        final var expected = List.of("deve ser um nome bem formado");
         assertThat(validations).isEqualTo(expected).as(description);
     }
 

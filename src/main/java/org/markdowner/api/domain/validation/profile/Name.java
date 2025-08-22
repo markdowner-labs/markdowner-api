@@ -17,9 +17,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 
-@NotNull(message = "must not be null name")
-@Size(max = Name.MAX_SIZE, message = "size must contain a maximum of " + Name.MAX_SIZE + " characters")
-@Pattern(regexp = "^[a-zA-Zà-ÿÀ-ß]+\\.?([ '\\-][a-zA-Zà-ÿÀ-ß]+\\.?)*$", message = "must be a well-formed name")
+@NotNull
+@Size(max = Name.MAX_SIZE, message = "deve conter no máximo " + Name.MAX_SIZE + " caracteres")
+@Pattern(regexp = "^[a-zA-Zà-ÿÀ-ß]+\\.?([ '\\-][a-zA-Zà-ÿÀ-ß]+\\.?)*$", message = "deve ser um nome bem formado")
 @Constraint(validatedBy = {})
 @Target({ ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.ANNOTATION_TYPE })
 @Retention(RetentionPolicy.RUNTIME)
