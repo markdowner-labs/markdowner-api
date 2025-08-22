@@ -53,7 +53,7 @@ public class EmailTest {
         final var validations = assertThrows(ConstraintViolationException.class, () -> {
             Email.Validation.validate(email);
         }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
-        final var expected = List.of("must be a well-formed email address");
+        final var expected = List.of("deve ser um endereço de e-mail bem formado");
         assertThat(validations).isEqualTo(expected).as(description);
     }
 

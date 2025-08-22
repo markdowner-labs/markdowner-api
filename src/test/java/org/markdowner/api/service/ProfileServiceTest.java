@@ -113,7 +113,7 @@ public class ProfileServiceTest {
                 final var validations = assertThrows(ConstraintViolationException.class, () -> {
                         service.findByEmail(email);
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
-                final var expected = List.of("must be a well-formed email address");
+                final var expected = List.of("deve ser um endereço de e-mail bem formado");
                 assertThat(validations).isEqualTo(expected).as(description);
                 verify(repository, never().description(description)).findByEmail(email);
         }
@@ -164,7 +164,7 @@ public class ProfileServiceTest {
                 var validations = assertThrows(ConstraintViolationException.class, () -> {
                         service.findByNameContainingIgnoreCase(limit, "P. Alvares Cabral", UUID.randomUUID(), "any_name");
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
-                final var expected = List.of("must be greater than 0");
+                final var expected = List.of("deve ser maior que 0");
                 assertThat(validations).isEqualTo(expected).as(description);
                 verify(repository, never().description(description)).findByNameContainingIgnoreCase(limit, "P. Alvares Cabral", UUID.randomUUID(), "any_name");
 
@@ -182,7 +182,7 @@ public class ProfileServiceTest {
                 final var validations = assertThrows(ConstraintViolationException.class, () -> {
                         service.findByNameContainingIgnoreCase(1, "Pedro A. Cabral", null, "any_name");
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
-                final var expected = List.of("must not be null");
+                final var expected = List.of("não deve ser nulo");
                 assertThat(validations).isEqualTo(expected).as(description);
                 verify(repository, never().description(description)).findByNameContainingIgnoreCase(1, "Pedro A. Cabral", null, "any_name");
         }
@@ -194,7 +194,7 @@ public class ProfileServiceTest {
                 var validations = assertThrows(ConstraintViolationException.class, () -> {
                         service.findByNameContainingIgnoreCase(1, "Pedro Alvares C.", UUID.randomUUID(), null);
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
-                final var expected = List.of("must not be blank");
+                final var expected = List.of("não deve estar em branco");
                 assertThat(validations).isEqualTo(expected).as(description);
                 verify(repository, never().description(description)).findByNameContainingIgnoreCase(1, "Pedro Alvares C.", UUID.randomUUID(), null);
 
