@@ -17,7 +17,7 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 
 @NotNull
-@Size(min = Password.MIN_SIZE, max = Password.MAX_SIZE, message = "o comprimento deve ser entre " + Password.MIN_SIZE + " e " + Password.MAX_SIZE)
+@Size(min = Password.MIN_SIZE, max = Password.MAX_SIZE, message = "deve conter entre " + Password.MIN_SIZE + " e " + Password.MAX_SIZE + " caracteres")
 @Constraint(validatedBy = {})
 @Target({ ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.ANNOTATION_TYPE })
 @Retention(RetentionPolicy.RUNTIME)

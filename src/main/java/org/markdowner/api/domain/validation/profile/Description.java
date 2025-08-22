@@ -15,7 +15,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 
-@Size(max = Description.MAX_SIZE, message = "o comprimento deve ser menor ou igual a " + Description.MAX_SIZE)
+@Size(max = Description.MAX_SIZE, message = "deve conter no máximo " + Description.MAX_SIZE + " caracteres")
 @Constraint(validatedBy = {})
 @Target({ ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.ANNOTATION_TYPE })
 @Retention(RetentionPolicy.RUNTIME)
