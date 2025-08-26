@@ -19,7 +19,7 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 
 @NotNull
-@Year(min = Birthday.MIN_YEAR, nullable = false, message = "deve ter mais de " + Birthday.MIN_YEAR + " anos")
+@Year(min = Birthday.MIN_YEAR, message = "deve ter mais de " + Birthday.MIN_YEAR + " anos")
 @Constraint(validatedBy = {})
 @Target({ ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.ANNOTATION_TYPE })
 @Retention(RetentionPolicy.RUNTIME)
