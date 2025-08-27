@@ -1,0 +1,74 @@
+{
+	"info": {
+		"_postman_id": "aaaf9b7f-1429-4a20-bbde-2da1ba639331",
+		"name": "markdowner-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31112680"
+	},
+	"item": [
+		{
+			"name": "profile",
+			"item": [
+				{
+					"name": "get",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v0/profile",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v0",
+								"profile"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "uuid7 identificador de perfil específico",
+									"disabled": true
+								},
+								{
+									"key": "email",
+									"value": "",
+									"description": "email identificador de perfil específico",
+									"disabled": true
+								},
+								{
+									"key": "name",
+									"value": "",
+									"description": "nome usado como termo de busca na paginação",
+									"disabled": true
+								},
+								{
+									"key": "lastSeenName",
+									"value": "",
+									"description": "último nome visto na paginação",
+									"disabled": true
+								},
+								{
+									"key": "lastSeenId",
+									"value": "",
+									"description": "último id visto na paginação",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "",
+									"description": "limitador de paginação",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
