@@ -246,4 +246,35 @@ public class ProfileRepositoryTest {
                 assertThat(whenStepsTree).isEqualTo(List.of(givenStepsFive));
         }
 
+        @Test
+        @DisplayName("não deve encontrar nenhum id inexistente")
+        public void notFound_findByIdTest() {
+                // when
+                final var when = repository.findById(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+                // then
+                assertThat(when).isNotPresent();
+        }
+
+        @Test
+        @DisplayName("deve encontrar o perfil pelo id")
+        public void found_findByIdTest() {
+                // given
+                final var given = Optional.of(profileAnaIsidoro());
+                // when
+                final var when = repository.findById(UUID.fromString("019b248e-a961-7000-233d-b99937ef11d4"));
+                // then
+                assertThat(when).isEqualTo(given);
+        }
+
+        @Test
+        @DisplayName("deve encontrar outro perfil pelo id")
+        public void foundOther_findByIdTest() {
+                // given
+                final var given = Optional.of(profileJulianaRios());
+                // when
+                final var when = repository.findById(UUID.fromString("019acd02-8d61-7000-dc08-f222fa8c30f4"));
+                // then
+                assertThat(when).isEqualTo(given);
+        }
+
 }

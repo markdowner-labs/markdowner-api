@@ -240,6 +240,36 @@ public class ProfileServiceTest {
                 verify(repository, times(1)).findByNameContainingIgnoreCase(10, profile.getName(), profile.getId(), profile.getName());
         }
 
+        @SuppressWarnings("null")
+        @Test
+        @DisplayName("Validação do campo id - caso nulo")
+        public void shouldRejectNullIdTest() {
+                final var description = "Id: está nulo";
+                final UUID nullId = null;
+                final var validations = assertThrows(ConstraintViolationException.class, () -> {
+                        service.findById(nullId);
+                }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                final var expected = List.of("não deve ser nulo");
+                assertThat(validations).isEqualTo(expected).as(description);
+                verify(repository, never().description(description)).findById(nullId);
+        }
 
+        @Test
+        @DisplayName("Validação do campo id - caso válido")
+        public void shouldAcceptValidFindById() {
+                final var profile = profile();
+                when(repository.findById(profile.getId())).thenReturn(Optional.of(profile));
+                assertThat(service.findById(profile.getId())).isEqualTo(Optional.of(profile));
+                verify(repository, times(1)).findById(profile.getId());
+        }
+
+        @Test
+        @DisplayName("Validação do campo id - caso não encontrado")
+        public void shouldReturnEmptyWhenIdNotFound() {
+                final var id = UUID.randomUUID();
+                when(repository.findById(id)).thenReturn(Optional.empty());
+                assertThat(service.findById(id)).isEmpty();
+                verify(repository, times(1)).findById(id);
+        }
 
 }

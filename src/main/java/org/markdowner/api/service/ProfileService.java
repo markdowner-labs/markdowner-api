@@ -23,6 +23,10 @@ public class ProfileService {
 
     private final ProfileRepository repository;
 
+    public Optional<Profile> findById(@NotNull final UUID id) {
+        return repository.findById(id);
+    }
+
     public Optional<Profile> findByEmail(final @Email String email) {
         return repository.findByEmail(email);
     }
