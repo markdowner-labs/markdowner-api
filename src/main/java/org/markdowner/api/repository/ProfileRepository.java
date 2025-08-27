@@ -15,6 +15,24 @@ public interface ProfileRepository extends JpaRepository<Profile, UUID> {
 
     @Query(nativeQuery = true, value = """
             select * from profile
+            order by (name_purified, id) asc
+            limit :limit
+            """)
+    List<Profile> findAll(final @Param("limit") int limit);
+
+    @Query(nativeQuery = true, value = """
+            select * from profile
+            where (name_purified, id) > (purify(:lastSeenName), :lastSeenId)
+            order by (name_purified, id) asc
+            limit :limit
+            """)
+    List<Profile> findAll(
+            final @Param("limit") int limit,
+            final @Param("lastSeenName") String lastSeenName,
+            final @Param("lastSeenId") UUID lastSeenId);
+
+    @Query(nativeQuery = true, value = """
+            select * from profile
             where
                 name_purified like '%' || purify(:name) || '%'
             order by (name_purified, id) asc
@@ -38,23 +56,5 @@ public interface ProfileRepository extends JpaRepository<Profile, UUID> {
             final @Param("lastSeenName") String lastSeenName,
             final @Param("lastSeenId") UUID lastSeenId,
             final @Param("name") String name);
-
-    @Query(nativeQuery = true, value = """
-            select * from profile
-            order by (name_purified, id) asc
-            limit :limit
-            """)
-    List<Profile> findAll(final @Param("limit") int limit);
-
-    @Query(nativeQuery = true, value = """
-            select * from profile
-            where (name_purified, id) > (purify(:lastSeenName), :lastSeenId)
-            order by (name_purified, id) asc
-            limit :limit
-            """)
-    List<Profile> findAll(
-            final @Param("limit") int limit,
-            final @Param("lastSeenName") String lastSeenName,
-            final @Param("lastSeenId") UUID lastSeenId);
 
 }
