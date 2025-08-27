@@ -272,4 +272,71 @@ public class ProfileServiceTest {
                 verify(repository, times(1)).findById(id);
         }
 
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("invalidLimitProvider")
+        @DisplayName("Validação do campo limit em findAll - casos inválidos")
+        public void shouldRejectZeroOrNegativeLimitInFindAll(final String description, final int limit) {
+                var validations = assertThrows(ConstraintViolationException.class, () -> {
+                        service.findAll(limit);
+                }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                final var expected = List.of("deve ser maior que 0");
+                assertThat(validations).isEqualTo(expected).as(description);
+                verify(repository, never().description(description)).findAll(limit);
+
+                validations = assertThrows(ConstraintViolationException.class, () -> {
+                        service.findAll(limit, "P. Dias D'Ávila São M.", UUID.randomUUID());
+                }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                assertThat(validations).isEqualTo(expected).as(description);
+                verify(repository, never().description(description)).findAll(limit, "P. Dias D'Ávila São M.", UUID.randomUUID());
+        }
+
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("invalidNameProvider")
+        @DisplayName("Validação do campo lastSeenName em findAll - nome inválido")
+        public void shouldRejectInvalidLastSeenNameInFindAll(final String description, final String name) {
+                var validations = assertThrows(ConstraintViolationException.class, () -> {
+                        service.findAll(1, name, UUID.randomUUID());
+                }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                final var expected = List.of("deve ser um nome bem formado");
+                assertThat(validations).isEqualTo(expected).as(description);
+                verify(repository, never().description(description)).findAll(1, name, UUID.randomUUID());
+        }
+
+        @Test
+        @DisplayName("Validação do campo lastSeenId em findAll - caso nulo")
+        public void shouldRejectNullLastSeenIdInFindAll() {
+                final var description = "lastSeenId: está nulo";
+                var validations = assertThrows(ConstraintViolationException.class, () -> {
+                        service.findAll(1, "P. Dias D'Ávila São M.", null);
+                }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                final var expected = List.of("não deve ser nulo");
+                assertThat(validations).isEqualTo(expected).as(description);
+                verify(repository, never().description(description)).findAll(1, "P. Dias D'Ávila São M.", null);
+        }
+
+        @Test
+        @DisplayName("Validação do campo lastSeenName em findAll - nome longo demais")
+        public void shouldRejectOverSizeLastSeenNameInFindAll() {
+                final var description = "lastSeenName: longo demais";
+                final var longSizeName = "um nome longo demais para ser aceito";
+                var validations = assertThrows(ConstraintViolationException.class, () -> {
+                        service.findAll(1, longSizeName, UUID.randomUUID());
+                }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                final var expected = List.of("deve conter no máximo 30 caracteres");
+                assertThat(validations).isEqualTo(expected).as(description);
+                verify(repository, never().description(description)).findAll(1, longSizeName, UUID.randomUUID());
+        }
+
+        @Test
+        @DisplayName("Validação do método findAll - caso válido")
+        public void shouldAcceptValidFindAll() {
+                final var profile = profile();
+                when(repository.findAll(10)).thenReturn(List.of(profile));
+                assertThat(service.findAll(10)).isEqualTo(List.of(profile));
+                verify(repository, times(1)).findAll(10);
+                when(repository.findAll(10, profile.getName(), profile.getId())).thenReturn(List.of(profile));
+                assertThat(service.findAll(10, profile.getName(), profile.getId())).isEqualTo(List.of(profile));
+                verify(repository, times(1)).findAll(10, profile.getName(), profile.getId());
+        }
+
 }

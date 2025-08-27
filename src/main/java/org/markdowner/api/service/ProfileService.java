@@ -31,6 +31,17 @@ public class ProfileService {
         return repository.findByEmail(email);
     }
 
+    public List<Profile> findAll(final @Positive int limit) {
+        return repository.findAll(limit);
+    }
+
+    public List<Profile> findAll(
+            final @Positive int limit,
+            final @Name String lastSeenName,
+            final @NotNull UUID lastSeenId) {
+        return repository.findAll(limit, lastSeenName, lastSeenId);
+    }
+
     public List<Profile> findByNameContainingIgnoreCase(
             final @Positive int limit,
             final @NotBlank String name) {
