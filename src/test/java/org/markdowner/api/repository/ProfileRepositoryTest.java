@@ -19,6 +19,61 @@ public class ProfileRepositoryTest {
         @Autowired
         private ProfileRepository repository;
 
+        private static final Profile profileAlbertoInacio() {
+                return Profile.builder()
+                                .id(UUID.fromString("019a9ea9-5161-7000-03f1-098e3277407e"))
+                                .name("Alberto Inácio")
+                                .description("Gerente de produto e inovação.")
+                                .birthday(LocalDate.of(1980, 4, 15))
+                                .email("alberto.inacio@example.com")
+                                .password("$2a$10$7Z0zPEtZklljGNH8JHcnRO0pOZAVlBH36Fg7QO9N1LD4thimBL.TW")
+                                .build();
+        }
+
+        private static final Profile profileAliceAlves() {
+                return Profile.builder()
+                                .id(UUID.fromString("01989bad-6161-7000-0ae9-f440b10578ec"))
+                                .name("Alice Alves")
+                                .description("Uma pessoa criativa e dedicada.")
+                                .birthday(LocalDate.of(1988, 1, 10))
+                                .email("alice@example.com")
+                                .password("$2a$10$7Z0zPEtZklljGNH8JHcnRO0pOZAVlBH36Fg7QO9N1LD4thimBL.TW")
+                                .build();
+        }
+
+        private static final Profile profileAlineCastro() {
+                return Profile.builder()
+                                .id(UUID.fromString("01999804-fd61-7000-7c85-7376e99e6b3f"))
+                                .name("Aline Castro")
+                                .description("Analista de sistemas e DevOps.")
+                                .birthday(LocalDate.of(1990, 9, 15))
+                                .email("aline.castro@example.com")
+                                .password("$2a$10$7Z0zPEtZklljGNH8JHcnRO0pOZAVlBH36Fg7QO9N1LD4thimBL.TW")
+                                .build();
+        }
+
+        private static final Profile profileAmandaEsteves() {
+                return Profile.builder()
+                                .id(UUID.fromString("019a18c3-f961-7000-f06d-02b1741682aa"))
+                                .name("Amanda Esteves")
+                                .description("Especialista em marketing de conteúdo.")
+                                .birthday(LocalDate.of(1984, 7, 29))
+                                .email("amanda.esteves@example.com")
+                                .password("$2a$10$7Z0zPEtZklljGNH8JHcnRO0pOZAVlBH36Fg7QO9N1LD4thimBL.TW")
+                                .build();
+        }
+
+        private static final Profile profileArturCordeiro() {
+                return Profile.builder()
+                                .id(UUID.fromString("01991746-0161-7000-de9f-dc071c54c03f"))
+                                .name("Artur Cordeiro")
+                                .description("Analista de sistemas com foco em dados.")
+                                .birthday(LocalDate.of(1987, 3, 9))
+                                .email("artur@example.com")
+                                .password("$2a$10$7Z0zPEtZklljGNH8JHcnRO0pOZAVlBH36Fg7QO9N1LD4thimBL.TW")
+                                .build();
+        }
+
         private static final Profile profileAnaIsidoro() {
                 return Profile.builder()
                                 .id(UUID.fromString("019b248e-a961-7000-233d-b99937ef11d4"))
@@ -275,6 +330,50 @@ public class ProfileRepositoryTest {
                 final var when = repository.findById(UUID.fromString("019acd02-8d61-7000-dc08-f222fa8c30f4"));
                 // then
                 assertThat(when).isEqualTo(given);
+        }
+
+        @Test
+        @DisplayName("deve retornar todos os perfis limitados pelo parâmetro")
+        public void foundLimit6_findAllTest() {
+                // given
+                final var given = List.of(
+                                profileAlbertoInacio(),
+                                profileAliceAlves(),
+                                profileAlineCastro(),
+                                profileAmandaEsteves(),
+                                profileAnaIsidoro(),
+                                profileArturCordeiro()
+                );
+                // when
+                final var when = repository.findAll(6);
+                // then
+                assertThat(when).isEqualTo(given);
+        }
+
+        @Test
+        @DisplayName("deve retornar os próximos perfis após o lastSeen")
+        public void foundNextPage_findAllTest() {
+                final var limit = 2;
+                // given
+                final var givenStepsOne = List.of(profileAlbertoInacio(), profileAliceAlves());
+                final var givenStepsTwo = List.of(profileAlineCastro(), profileAmandaEsteves());
+                final var givenStepsThree = List.of(profileAnaIsidoro(), profileArturCordeiro());
+                // when
+                final var whenStepsOne = repository.findAll(limit);
+                final var whenStepsTwo = repository.findAll(
+                                limit,
+                                "Alice Alves",
+                                UUID.fromString("01989bad-6161-7000-0ae9-f440b10578ec")
+                );
+                final var whenStepsThree = repository.findAll(
+                                limit,
+                                "Amanda Esteves",
+                                UUID.fromString("019a18c3-f961-7000-f06d-02b1741682aa")
+                );
+                // then
+                assertThat(whenStepsOne).isEqualTo(givenStepsOne);
+                assertThat(whenStepsTwo).isEqualTo(givenStepsTwo);
+                assertThat(whenStepsThree).isEqualTo(givenStepsThree);
         }
 
 }
