@@ -1,4 +1,4 @@
-package org.markdowner.api.controller.model;
+package org.markdowner.api.controller;
 
 import static java.util.Objects.nonNull;
 import static org.springframework.util.StringUtils.hasText;
@@ -17,21 +17,18 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(Routes.PROFILE)
-public class ProfileController implements org.markdowner.api.controller.document.ProfileController {
+@RequestMapping(value = Routes.PROFILE, produces = { "application/json" })
+public class ProfileController {
     private final ProfileService service;
 
-    @Override
-    @GetMapping(produces = "application/json")
+    @GetMapping
     public ResponseEntity<?> get(
-
             @RequestParam(required = false) final UUID id,
             @RequestParam(required = false) final String email,
             @RequestParam(required = false) final String name,
             @RequestParam(required = false) final String lastSeenName,
             @RequestParam(required = false) final UUID lastSeenId,
             @RequestParam(defaultValue = "100", required = false) final int limit) {
-
         if (nonNull(id)) {
             return ResponseEntity.of(service.findById(id));
         }
