@@ -1,4 +1,4 @@
-package org.markdowner.api.controller;
+package org.markdowner.api.controller.model;
 
 import static java.util.Objects.nonNull;
 import static org.springframework.util.StringUtils.hasText;
@@ -13,30 +13,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(Routes.PROFILE)
-public class ProfileController {
+public class ProfileController implements org.markdowner.api.controller.document.ProfileController {
     private final ProfileService service;
 
-    @Operation(description = "Busca o aluno pelo id, email ou nome. Também permite paginação e busca incremental.", responses = {
-            @ApiResponse(responseCode = "200", description = "Retorna o(s) aluno(s) conforme o filtro aplicado", content = @Content(mediaType = "application/json"))
-    })
+    @Override
     @GetMapping(produces = "application/json")
     public ResponseEntity<?> get(
 
-            @Parameter(description = "ID do aluno para busca direta") @RequestParam(required = false) final UUID id,
-            @Parameter(description = "Email do aluno para busca direta") @RequestParam(required = false) final String email,
-            @Parameter(description = "Nome do aluno para busca por nome") @RequestParam(required = false) final String name,
-            @Parameter(description = "Nome do último aluno retornado na paginação") @RequestParam(required = false) final String lastSeenName,
-            @Parameter(description = "ID do último aluno retornado na paginação") @RequestParam(required = false) final UUID lastSeenId,
-            @Parameter(description = "Limite de resultados retornados (padrão: 100)") @RequestParam(defaultValue = "100", required = false) final int limit) {
+            @RequestParam(required = false) final UUID id,
+            @RequestParam(required = false) final String email,
+            @RequestParam(required = false) final String name,
+            @RequestParam(required = false) final String lastSeenName,
+            @RequestParam(required = false) final UUID lastSeenId,
+            @RequestParam(defaultValue = "100", required = false) final int limit) {
 
         if (nonNull(id)) {
             return ResponseEntity.of(service.findById(id));
