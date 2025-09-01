@@ -1,0 +1,28 @@
+package org.markdowner.api.handler;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import jakarta.validation.ConstraintViolationException;
+
+@RestControllerAdvice
+public class ExceptionHandler {
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<?> handle(final ConstraintViolationException exception) {
+        final var allErrors = new HashMap<String, List<String>>();
+        exception.getConstraintViolations().forEach(violation -> {
+            final var propertyPath = violation.getPropertyPath().toString();
+            final var propertyName = propertyPath.substring(propertyPath.lastIndexOf('.') + 1);
+            allErrors.computeIfAbsent(propertyName, key -> {
+                return new LinkedList<>();
+            }).add(violation.getMessage());
+        });
+        return ResponseEntity.badRequest().body(allErrors);
+    }
+
+}
