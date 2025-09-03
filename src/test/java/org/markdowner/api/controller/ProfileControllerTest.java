@@ -62,7 +62,7 @@ public class ProfileControllerTest {
                                 .andExpect(status().isBadRequest())
                                 .andReturn().getResponse().getContentAsString();
 
-                assertEquals("{\"email\":[\"must be a well-formed email address\"]}", response, email);
+                assertEquals("{\"email\":[\"deve ser um endereço de e-mail bem formado\"]}", response, email);
         }
 
 }
