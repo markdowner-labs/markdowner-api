@@ -1,7 +1,6 @@
 package org.markdowner.api.controller;
 
 import static java.util.Objects.nonNull;
-import static org.springframework.util.StringUtils.hasText;
 
 import java.util.UUID;
 
@@ -32,16 +31,16 @@ public class ProfileController {
         if (nonNull(id)) {
             return ResponseEntity.of(service.findById(id));
         }
-        if (hasText(email)) {
+        if (nonNull(email)) {
             return ResponseEntity.of(service.findByEmail(email));
         }
-        if (hasText(name)) {
-            if (hasText(lastSeenName) || nonNull(lastSeenId)) {
+        if (nonNull(name)) {
+            if (nonNull(lastSeenName) || nonNull(lastSeenId)) {
                 return ResponseEntity.ok(service.findByNameContainingIgnoreCase(limit, lastSeenName, lastSeenId, name));
             }
             return ResponseEntity.ok(service.findByNameContainingIgnoreCase(limit, name));
         }
-        if (hasText(lastSeenName) || nonNull(lastSeenId)) {
+        if (nonNull(lastSeenName) || nonNull(lastSeenId)) {
             return ResponseEntity.ok(service.findAll(limit, lastSeenName, lastSeenId));
         }
         return ResponseEntity.ok(service.findAll(limit));
