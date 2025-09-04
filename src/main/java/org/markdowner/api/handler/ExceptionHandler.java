@@ -3,9 +3,12 @@ package org.markdowner.api.handler;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import jakarta.validation.ConstraintViolationException;
 
@@ -23,6 +26,14 @@ public class ExceptionHandler {
             }).add(violation.getMessage());
         });
         return ResponseEntity.badRequest().body(allErrors);
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<?> handle(final MethodArgumentTypeMismatchException exception) {
+        final var fullPropertyType = Optional.ofNullable(exception.getRequiredType()).map(Class::getName).orElse("unknown");
+        final var propertyType = fullPropertyType.substring(fullPropertyType.lastIndexOf('.') + 1);
+        final var propertyName = exception.getName();
+        return ResponseEntity.badRequest().body(Map.of(propertyName, "deve pertencer ao tipo ".concat(propertyType)));
     }
 
 }
