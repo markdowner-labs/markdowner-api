@@ -29,6 +29,26 @@ public class ProfileControllerTest {
 
         @ParameterizedTest
         @CsvSource(value = {
+                "Id: identificador inválido;0199125e-z345-719b-8607-7eb3769dbfa6",
+                "Id: identificador mal formado;0199125e-z345-719b-8607"
+        }, delimiter = ';')
+        @DisplayName("Validação do campo Id - casos inválidos")
+        void shouldFindProfilesByIdTest(final String description, final String id) throws Exception {
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("id", id);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isBadRequest())
+                                .andReturn().getResponse().getContentAsString();
+
+                assertEquals("{\"id\":\"deve pertencer ao tipo UUID\"}", response, description);
+        }
+
+        @ParameterizedTest
+        @CsvSource(value = {
                         "Email: letra maiúscula no usuário;Juliana.rios@example.com",
                         "Email: caractere inválido '!' no usuário;juliana!rios@example.com",
                         "Email: espaço no usuário;juliana rios@example.com",
@@ -51,7 +71,7 @@ public class ProfileControllerTest {
                         "Email: endereço de email com mais de 76 caracteres;rprsgefxrayrpaydsncgdxpsnhwpryazfrrbjzkugvqimfidwpcjiyapipyvrehko@example.com",
         }, delimiter = ';')
         @DisplayName("Validação do campo Email - casos inválidos")
-        void shouldFindProfilesByNameOnly_case1(final String description, final String email) throws Exception {
+        void shouldFindProfilesByEmailTest(final String description, final String email) throws Exception {
                 final var request = MockMvcRequestBuilders
                                 .get(Routes.PROFILE)
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -62,7 +82,7 @@ public class ProfileControllerTest {
                                 .andExpect(status().isBadRequest())
                                 .andReturn().getResponse().getContentAsString();
 
-                assertEquals("{\"email\":[\"deve ser um endereço de e-mail bem formado\"]}", response, email);
+                assertEquals("{\"email\":[\"deve ser um endereço de e-mail bem formado\"]}", response, description);
         }
 
 }
