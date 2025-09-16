@@ -36,4 +36,9 @@ public class ExceptionHandler {
         return ResponseEntity.badRequest().body(Map.of(propertyName, "deve pertencer ao tipo ".concat(propertyType)));
     }
 
+    @org.springframework.web.bind.annotation.ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<?> handle() {
+        return ResponseEntity.internalServerError().build();
+    }
+
 }

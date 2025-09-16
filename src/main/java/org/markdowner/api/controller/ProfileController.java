@@ -49,7 +49,7 @@ public class ProfileController {
 }
 
 /*
- * 1. Criar fixture de build de profiles.
+ * 1. Criar cache redis.
  * 2. Testar individualmente cada parâmetro do método get.
  * 3. Criar capturador de exceções.
  */
