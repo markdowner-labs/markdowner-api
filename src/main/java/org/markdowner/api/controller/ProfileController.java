@@ -50,5 +50,10 @@ public class ProfileController {
 
 /*
  * 1. Criar cache redis.
- * 2. Testar individualmente cada parâmetro do método get.
+ * 2. Testar individualmente cada parâmetro do método get. (levantar casos de teste usando o service)
+ * 3. Criar classe de paginação.
+ * 4. Ocultar:
+ *      nascimento (exibição opcional)
+ *      email (exibição opcional)
+ *      senha (sem exibição)
  */
