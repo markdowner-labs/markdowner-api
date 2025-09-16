@@ -6,9 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.markdowner.api.service.ProfileService;
 import org.markdowner.api.util.Routes;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,10 +20,6 @@ public class ProfileControllerTest {
 
         @Autowired
         private MockMvc mockMvc;
-
-        @Autowired
-        @InjectMocks
-        private ProfileService profileService;
 
         @ParameterizedTest
         @CsvSource(value = {
