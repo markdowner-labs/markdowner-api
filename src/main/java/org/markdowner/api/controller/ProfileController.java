@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class ProfileController {
     private final ProfileService service;
 
-    private Profile protect(final Profile profile) {
+    private Profile hideSensitiveInfo(final Profile profile) {
         return profile.toBuilder().birthday(null).email(null).build();
     }
 
@@ -34,21 +34,21 @@ public class ProfileController {
             @RequestParam(required = false) final UUID lastSeenId,
             @RequestParam(defaultValue = "100", required = false) final int limit) {
         if (nonNull(id)) {
-            return ResponseEntity.of(service.findById(id).map(this::protect));
+            return ResponseEntity.of(service.findById(id).map(this::hideSensitiveInfo));
         }
         if (nonNull(email)) {
-            return ResponseEntity.of(service.findByEmail(email).map(this::protect));
+            return ResponseEntity.of(service.findByEmail(email).map(this::hideSensitiveInfo));
         }
         if (nonNull(name)) {
             final var profiles = (nonNull(lastSeenName) || nonNull(lastSeenId))
                     ? service.findByNameContainingIgnoreCase(limit, lastSeenName, lastSeenId, name)
                     : service.findByNameContainingIgnoreCase(limit, name);
-            return ResponseEntity.ok(profiles.stream().map(this::protect));
+            return ResponseEntity.ok(profiles.stream().map(this::hideSensitiveInfo));
         }
         final var profiles = (nonNull(lastSeenName) || nonNull(lastSeenId))
                 ? service.findAll(limit, lastSeenName, lastSeenId)
                 : service.findAll(limit);
-        return ResponseEntity.ok(profiles.stream().map(this::protect));
+        return ResponseEntity.ok(profiles.stream().map(this::hideSensitiveInfo));
     }
 
 }
