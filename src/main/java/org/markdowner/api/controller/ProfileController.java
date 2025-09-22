@@ -4,6 +4,7 @@ import static java.util.Objects.nonNull;
 
 import java.util.UUID;
 
+import org.markdowner.api.domain.model.Profile;
 import org.markdowner.api.service.ProfileService;
 import org.markdowner.api.util.Routes;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,10 @@ import lombok.RequiredArgsConstructor;
 public class ProfileController {
     private final ProfileService service;
 
+    private Profile protect(final Profile profile) {
+        return profile.toBuilder().birthday(null).email(null).build();
+    }
+
     @GetMapping
     public ResponseEntity<?> get(
             @RequestParam(required = false) final UUID id,
@@ -29,31 +34,32 @@ public class ProfileController {
             @RequestParam(required = false) final UUID lastSeenId,
             @RequestParam(defaultValue = "100", required = false) final int limit) {
         if (nonNull(id)) {
-            return ResponseEntity.of(service.findById(id));
+            return ResponseEntity.of(service.findById(id).map(this::protect));
         }
         if (nonNull(email)) {
-            return ResponseEntity.of(service.findByEmail(email));
+            return ResponseEntity.of(service.findByEmail(email).map(this::protect));
         }
         if (nonNull(name)) {
-            if (nonNull(lastSeenName) || nonNull(lastSeenId)) {
-                return ResponseEntity.ok(service.findByNameContainingIgnoreCase(limit, lastSeenName, lastSeenId, name));
-            }
-            return ResponseEntity.ok(service.findByNameContainingIgnoreCase(limit, name));
+            final var profiles = (nonNull(lastSeenName) || nonNull(lastSeenId))
+                    ? service.findByNameContainingIgnoreCase(limit, lastSeenName, lastSeenId, name)
+                    : service.findByNameContainingIgnoreCase(limit, name);
+            return ResponseEntity.ok(profiles.stream().map(this::protect));
         }
-        if (nonNull(lastSeenName) || nonNull(lastSeenId)) {
-            return ResponseEntity.ok(service.findAll(limit, lastSeenName, lastSeenId));
-        }
-        return ResponseEntity.ok(service.findAll(limit));
+        final var profiles = (nonNull(lastSeenName) || nonNull(lastSeenId))
+            ? service.findAll(limit, lastSeenName, lastSeenId)
+            : service.findAll(limit);
+        return ResponseEntity.ok(profiles.stream().map(this::protect));
     }
 
 }
 
 /*
  * 1. Criar cache redis.
- * 2. Testar individualmente cada parâmetro do método get. (levantar casos de teste usando o service)
+ * 2. Testar individualmente cada parâmetro do método get. (levantar casos de
+ * teste usando o service)
  * 3. Criar classe de paginação.
  * 4. Ocultar:
- *      nascimento (exibição opcional)
- *      email (exibição opcional)
- *      senha (sem exibição)
+ * nascimento (exibição opcional)
+ * email (exibição opcional)
+ * senha (sem exibição)
  */

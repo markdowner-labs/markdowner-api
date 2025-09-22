@@ -10,6 +10,9 @@ import org.markdowner.api.domain.validation.profile.Email;
 import org.markdowner.api.domain.validation.profile.Name;
 import org.markdowner.api.domain.validation.profile.Password;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -20,6 +23,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.With;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @With
 @Data
 @Builder(toBuilder = true)
@@ -47,6 +51,7 @@ public class Profile implements Serializable {
 
     @Password
     @Column(columnDefinition = "char(60)")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
 }
