@@ -1,6 +1,7 @@
 package org.markdowner.api.controller;
 
 import static java.util.Objects.nonNull;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import java.util.UUID;
 
@@ -17,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = Routes.PROFILE, produces = { "application/json" })
+@RequestMapping(value = Routes.PROFILE, produces = { APPLICATION_JSON_VALUE })
 public class ProfileController {
     private final ProfileService service;
 
