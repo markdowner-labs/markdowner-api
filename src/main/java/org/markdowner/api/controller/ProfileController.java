@@ -46,8 +46,8 @@ public class ProfileController {
             return ResponseEntity.ok(profiles.stream().map(this::protect));
         }
         final var profiles = (nonNull(lastSeenName) || nonNull(lastSeenId))
-            ? service.findAll(limit, lastSeenName, lastSeenId)
-            : service.findAll(limit);
+                ? service.findAll(limit, lastSeenName, lastSeenId)
+                : service.findAll(limit);
         return ResponseEntity.ok(profiles.stream().map(this::protect));
     }
 
