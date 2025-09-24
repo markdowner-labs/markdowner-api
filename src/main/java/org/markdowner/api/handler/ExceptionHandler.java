@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.markdowner.api.util.ResourceException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -39,6 +40,13 @@ public class ExceptionHandler {
     @org.springframework.web.bind.annotation.ExceptionHandler(NullPointerException.class)
     public ResponseEntity<?> handle() {
         return ResponseEntity.internalServerError().build();
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(ResourceException.class)
+    public ResponseEntity<?> handle(final ResourceException exception) {
+        return exception.getContent().isEmpty()
+                ? ResponseEntity.status(exception.getStatus()).build()
+                : ResponseEntity.status(exception.getStatus()).body(exception.getContent());
     }
 
 }

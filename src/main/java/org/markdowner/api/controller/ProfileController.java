@@ -3,10 +3,12 @@ package org.markdowner.api.controller;
 import static java.util.Objects.nonNull;
 import static org.markdowner.api.util.ResponseEntityUtils.JsonViewer;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.util.UUID;
 
 import org.markdowner.api.service.ProfileService;
+import org.markdowner.api.util.ResourceException;
 import org.markdowner.api.util.Routes;
 import org.markdowner.api.util.Viewer;
 import org.springframework.http.ResponseEntity;
@@ -32,22 +34,28 @@ public class ProfileController {
             @RequestParam(required = false) final UUID lastSeenId,
             @RequestParam(defaultValue = "100", required = false) final int limit) {
         if (nonNull(id)) {
-            final var responseBody = service.findById(id);
+            final var responseBody = service.findById(id).orElseThrow(ResourceException::notFound);
             return ResponseEntity.ok(JsonViewer(Viewer.Public.class, responseBody));
         }
         if (nonNull(email)) {
-            final var responseBody = service.findByEmail(email);
+            final var responseBody = service.findByEmail(email).orElseThrow(ResourceException::notFound);
             return ResponseEntity.ok(JsonViewer(Viewer.Public.class, responseBody));
         }
         if (nonNull(name)) {
             final var responseBody = (nonNull(lastSeenName) || nonNull(lastSeenId))
                     ? service.findByNameContainingIgnoreCase(limit, lastSeenName, lastSeenId, name)
                     : service.findByNameContainingIgnoreCase(limit, name);
+            if (isEmpty(responseBody)) {
+                throw ResourceException.notFound();
+            }
             return ResponseEntity.ok(JsonViewer(Viewer.Public.class, responseBody));
         }
         final var responseBody = (nonNull(lastSeenName) || nonNull(lastSeenId))
                 ? service.findAll(limit, lastSeenName, lastSeenId)
                 : service.findAll(limit);
+        if (isEmpty(responseBody)) {
+            throw ResourceException.notFound();
+        }
         return ResponseEntity.ok(JsonViewer(Viewer.Public.class, responseBody));
     }
 
