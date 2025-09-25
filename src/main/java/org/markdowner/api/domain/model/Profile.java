@@ -11,6 +11,7 @@ import org.markdowner.api.domain.validation.profile.Name;
 import org.markdowner.api.domain.validation.profile.Password;
 import org.markdowner.api.util.Viewer;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import jakarta.persistence.Column;
@@ -55,7 +56,7 @@ public class Profile implements Serializable {
 
     @Password
     @Column(columnDefinition = "char(60)")
-    @JsonView(Viewer.Private.class)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
 }
