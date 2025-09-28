@@ -1,8 +1,8 @@
 package org.markdowner.api.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.markdowner.api.fixture.Fixtures.profilePathResponseBody;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -612,6 +612,101 @@ public class ProfileControllerTest {
                                     "limit": [
                                         "deve ser maior que 0"
                                     ]
+                                }
+                                """;
+
+                assertThat(response).isEqualToIgnoringWhitespace(expectedResponse).as(description);
+        }
+
+        @ParameterizedTest
+        @CsvSource(value = {
+                        "Nome: número no valor;João123",
+                        "Nome: caractere inválido '!';Maria!",
+                        "Nome: caractere inválido '@';José@Silva",
+                        "Nome: caractere inválido '_';Ana_Souza",
+                        "Nome: dois espaços consecutivos;João  Silva",
+                        "Nome: dois hífens consecutivos;Ana--Clara",
+                        "Nome: dois apóstrofos consecutivos;O''Neill",
+                        "Nome: hífen no final;Pedro-",
+                        "Nome: apóstrofo no final;Luiz'",
+                        "Nome: apenas hífen;-",
+                        "Nome: apenas apóstrofo;'",
+                        "Nome: letra fora do intervalo permitido (estilizada);𝓙𝓸𝓼é",
+                        "Nome: letra fora do intervalo permitido (turca);İlker",
+                        "Nome: letra fora do intervalo permitido (polonesa);Łukasz",
+                        "Nome: ponto antes de leta;.Pedro Alvares Cabral",
+                        "Nome: ponto entre espaços;Pedro . Alvares Cabral",
+                        "Nome: ponto após espaço;Pedro .Alvares Cabral"
+        }, delimiter = ';')
+        @DisplayName("Deve retornar erro 400 - BAD_REQUEST quando lastSeenName é inválido na busca paginada")
+        void shouldReturnBadRequestWhenLastSeenNameIsInvalidInPaginatedNameSearch(final String description,
+                        final String invalidLastSeenName) throws Exception {
+
+                final var name = "João";
+
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("name", name)
+                                .queryParam("lastSeenName", invalidLastSeenName)
+                                .queryParam("lastSeenId", "019a9ea9-5161-7000-03f1-098e3277407e");
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isBadRequest())
+                                .andReturn().getResponse().getContentAsString();
+
+                final String expectedResponse = """
+                                {
+                                        "lastSeenName": [
+                                                "deve ser um nome bem formado"
+                                        ]
+                                }
+                                """;
+
+                assertThat(response).isEqualToIgnoringWhitespace(expectedResponse).as(description);
+        }
+
+        @ParameterizedTest
+        @CsvSource(value = {
+                        "Nome: número no valor;João123",
+                        "Nome: caractere inválido '!';Maria!",
+                        "Nome: caractere inválido '@';José@Silva",
+                        "Nome: caractere inválido '_';Ana_Souza",
+                        "Nome: dois espaços consecutivos;João  Silva",
+                        "Nome: dois hífens consecutivos;Ana--Clara",
+                        "Nome: dois apóstrofos consecutivos;O''Neill",
+                        "Nome: hífen no final;Pedro-",
+                        "Nome: apóstrofo no final;Luiz'",
+                        "Nome: apenas hífen;-",
+                        "Nome: apenas apóstrofo;'",
+                        "Nome: letra fora do intervalo permitido (estilizada);𝓙𝓸𝓼é",
+                        "Nome: letra fora do intervalo permitido (turca);İlker",
+                        "Nome: letra fora do intervalo permitido (polonesa);Łukasz",
+                        "Nome: ponto antes de leta;.Pedro Alvares Cabral",
+                        "Nome: ponto entre espaços;Pedro . Alvares Cabral",
+                        "Nome: ponto após espaço;Pedro .Alvares Cabral"
+        }, delimiter = ';')
+        @DisplayName("Deve retornar erro 400 - BAD_REQUEST quando lastSeenName é inválido paginação")
+        void shouldReturnBadRequestWhenLastSeenNameIsInvalidInPagination(final String description,
+                        final String invalidLastSeenName) throws Exception {
+
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("lastSeenName", invalidLastSeenName)
+                                .queryParam("lastSeenId", "019a9ea9-5161-7000-03f1-098e3277407e");
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isBadRequest())
+                                .andReturn().getResponse().getContentAsString();
+
+                final String expectedResponse = """
+                                {
+                                        "lastSeenName": [
+                                                "deve ser um nome bem formado"
+                                        ]
                                 }
                                 """;
 
