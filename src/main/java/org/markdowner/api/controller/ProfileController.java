@@ -4,6 +4,7 @@ import static java.util.Objects.nonNull;
 import static org.markdowner.api.util.ResponseEntityUtils.JsonViewer;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static org.springframework.util.StringUtils.hasText;
 
 import java.util.UUID;
 
@@ -37,7 +38,7 @@ public class ProfileController {
             final var responseBody = service.findById(id).orElseThrow(ResourceException::notFound);
             return ResponseEntity.ok(JsonViewer(Viewer.Public.class, responseBody));
         }
-        if (nonNull(email)) {
+        if (hasText(email)) {
             final var responseBody = service.findByEmail(email).orElseThrow(ResourceException::notFound);
             return ResponseEntity.ok(JsonViewer(Viewer.Public.class, responseBody));
         }

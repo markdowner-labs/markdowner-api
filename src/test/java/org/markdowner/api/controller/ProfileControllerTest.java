@@ -120,7 +120,9 @@ public class ProfileControllerTest {
 
                 final String expectedResponse = """
                                 {
-                                        "id": "deve pertencer ao tipo UUID"
+                                        "id": [
+                                                "deve pertencer ao tipo UUID"
+                                        ]
                                 }
                                 """;
 
@@ -145,4 +147,145 @@ public class ProfileControllerTest {
                 assertThat(response).isBlank().as(description);
         }
 
+        @Test
+        @DisplayName("Deve retornar 200 - OK quando o email é encontrado")
+        void shouldReturnOkWhenEmailIsRegistered() throws Exception {
+                final var description = "Email: email registrado";
+                final var email = "alberto.inacio@example.com";
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("email", email);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isOk())
+                                .andReturn().getResponse().getContentAsString();
+
+                final String expectedResponse = """
+                                {
+                                    "id": "019a9ea9-5161-7000-03f1-098e3277407e",
+                                    "name": "Alberto Inácio",
+                                    "description": "Gerente de produto e inovação."
+                                }
+                                """;
+
+                assertThat(response).isEqualToIgnoringWhitespace(expectedResponse).as(description);
+        }
+
+        @Test
+        @DisplayName("Deve retornar 200 - OK quando o email é nulo")
+        void shouldReturnOkWhenEmailIsNull() throws Exception {
+                final var description = "Email: email é nulo";
+                final String email = null;
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("email", email);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isOk())
+                                .andReturn().getResponse().getContentAsString();
+
+                assertThat(response).isEqualToIgnoringWhitespace(profilePathResponseBody).as(description);
+        }
+
+        @Test
+        @DisplayName("Deve retornar 200 - OK quando o email está em branco")
+        void shouldReturnOkWhenEmailIsBlank() throws Exception {
+                final var description = "Email: email está em branco";
+                final String email = "";
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("email", email);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isOk())
+                                .andReturn().getResponse().getContentAsString();
+
+                assertThat(response).isEqualToIgnoringWhitespace(profilePathResponseBody).as(description);
+        }
+
+        @Test
+        @DisplayName("Deve retornar 200 - OK quando o email não está presente")
+        void shouldReturnOkWhenEmailIsNotPresent() throws Exception {
+                final var description = "Email: email não está presente";
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isOk())
+                                .andReturn().getResponse().getContentAsString();
+
+                assertThat(response).isEqualToIgnoringWhitespace(profilePathResponseBody).as(description);
+        }
+
+        @ParameterizedTest
+        @CsvSource(value = {
+                        "Email: letra maiúscula no usuário;Juliana.rios@example.com",
+                        "Email: caractere inválido '!' no usuário;juliana!rios@example.com",
+                        "Email: espaço no usuário;juliana rios@example.com",
+                        "Email: espaço antes do domínio;juliana.rios@ example.com",
+                        "Email: espaço antes do TLD;juliana.rios@example .com",
+                        "Email: ausência de arroba;juliana.riosexample.com",
+                        "Email: dois arrobas;juliana.rios@@example.com",
+                        "Email: ausência de TLD;juliana.rios@example",
+                        "Email: TLD com menos de duas letras;juliana.rios@example.c",
+                        "Email: número no TLD;juliana.rios@example.c0m",
+                        "Email: maiúsculas no TLD;juliana.rios@example.CoM",
+                        "Email: domínio iniciando com hífen;juliana.rios@-example.com",
+                        "Email: dois pontos consecutivos no domínio;juliana.rios@example..com",
+                        "Email: domínio terminando com hífen;juliana.rios@example-.com",
+                        "Email: caractere acentuado no usuário;juliána.rios@example.com",
+                        "Email: vírgula no TLD;juliana.rios@example,com",
+                        "Email: caractere inválido '!' no domínio;juliana.rios@exam!ple.com",
+                        "Email: espaço no meio do domínio;juliana.rios@exa mple.com",
+                        "Email: domínio iniciando com ponto;juliana.rios@.example.com",
+                        "Email: endereço de email com mais de 76 caracteres;rprsgefxrayrpaydsncgdxpsnhwpryazfrrbjzkugvqimfidwpcjiyapipyvrehko@example.com"
+        }, delimiter = ';')
+        @DisplayName("Deve retornar erro 400 - BAD_REQUEST quando o email é inválido")
+        void shouldReturnBadRequestWhenEmailIsInvalid(final String description, final String email) throws Exception {
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("email", email);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isBadRequest())
+                                .andReturn().getResponse().getContentAsString();
+
+                final String expectedResponse = """
+                                {
+                                        "email": [
+                                                "deve ser um endereço de e-mail bem formado"
+                                        ]
+                                }
+                                """;
+
+                assertThat(expectedResponse).isEqualToIgnoringWhitespace(response).as(description);
+        }
+
+        @Test
+        @DisplayName("Deve retornar erro 404 - NOT_FOUND quando o email não é encontrado")
+        void shouldReturnNotFoundWhenEmailIsNotRegistered() throws Exception {
+                final var description = "Email: email não registrado";
+                final var email = "email.nao.registrado@exemplo.com";
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("email", email);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isNotFound())
+                                .andReturn().getResponse().getContentAsString();
+
+                assertThat(response).isBlank().as(description);
+        }
 }

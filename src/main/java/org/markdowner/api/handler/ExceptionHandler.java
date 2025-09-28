@@ -34,7 +34,7 @@ public class ExceptionHandler {
         final var fullPropertyType = Optional.ofNullable(exception.getRequiredType()).map(Class::getName).orElse("unknown");
         final var propertyType = fullPropertyType.substring(fullPropertyType.lastIndexOf('.') + 1);
         final var propertyName = exception.getName();
-        return ResponseEntity.badRequest().body(Map.of(propertyName, "deve pertencer ao tipo ".concat(propertyType)));
+        return ResponseEntity.badRequest().body(Map.of(propertyName, List.of("deve pertencer ao tipo ".concat(propertyType))));
     }
 
     @org.springframework.web.bind.annotation.ExceptionHandler(NullPointerException.class)
