@@ -1,6 +1,6 @@
 package org.markdowner.api.controller;
 
-import static java.util.Objects.nonNull;
+import static java.util.Objects.isNull;
 import static org.markdowner.api.util.ResponseEntityUtils.JsonViewer;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -34,7 +34,7 @@ public class ProfileController {
             @RequestParam(required = false) final String lastSeenName,
             @RequestParam(required = false) final UUID lastSeenId,
             @RequestParam(defaultValue = "100", required = false) final int limit) {
-        if (nonNull(id)) {
+        if (!isNull(id)) {
             final var responseBody = service.findById(id).orElseThrow(ResourceException::notFound);
             return ResponseEntity.ok(JsonViewer(Viewer.Public.class, responseBody));
         }
@@ -42,8 +42,8 @@ public class ProfileController {
             final var responseBody = service.findByEmail(email).orElseThrow(ResourceException::notFound);
             return ResponseEntity.ok(JsonViewer(Viewer.Public.class, responseBody));
         }
-        if (nonNull(name)) {
-            final var responseBody = (nonNull(lastSeenName) || nonNull(lastSeenId))
+        if (hasText(name)) {
+            final var responseBody = (hasText(lastSeenName) || !isNull(lastSeenId))
                     ? service.findByNameContainingIgnoreCase(limit, lastSeenName, lastSeenId, name)
                     : service.findByNameContainingIgnoreCase(limit, name);
             if (isEmpty(responseBody)) {
@@ -51,7 +51,7 @@ public class ProfileController {
             }
             return ResponseEntity.ok(JsonViewer(Viewer.Public.class, responseBody));
         }
-        final var responseBody = (nonNull(lastSeenName) || nonNull(lastSeenId))
+        final var responseBody = (hasText(lastSeenName) || !isNull(lastSeenId))
                 ? service.findAll(limit, lastSeenName, lastSeenId)
                 : service.findAll(limit);
         if (isEmpty(responseBody)) {
