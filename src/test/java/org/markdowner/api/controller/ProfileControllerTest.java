@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.markdowner.api.util.Routes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -288,4 +289,333 @@ public class ProfileControllerTest {
 
                 assertThat(response).isBlank().as(description);
         }
+
+        @Test
+        @DisplayName("Deve retornar 200 - OK quando o name é encontrado")
+        void shouldReturnOkWhenNameIsFound() throws Exception {
+                final var description = "Name: nome encontrado";
+                final var name = "Alberto";
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("name", name);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isOk())
+                                .andReturn().getResponse().getContentAsString();
+
+                final String expectedResponse = """
+                                [
+                                    {
+                                        "id": "019a9ea9-5161-7000-03f1-098e3277407e",
+                                        "name": "Alberto Inácio",
+                                        "description": "Gerente de produto e inovação."
+                                    }
+                                ]
+                                """;
+
+                assertThat(response).isEqualToIgnoringWhitespace(expectedResponse).as(description);
+        }
+
+        @Test
+        @DisplayName("Deve retornar 200 - OK quando o name é encontrado com case insensitive")
+        void shouldReturnOkWhenNameIsFoundIgnoreCase() throws Exception {
+                final var description = "Name: nome encontrado ignorando case";
+                final var name = "ALBERTO";
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("name", name);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isOk())
+                                .andReturn().getResponse().getContentAsString();
+
+                final String expectedResponse = """
+                                [
+                                    {
+                                        "id": "019a9ea9-5161-7000-03f1-098e3277407e",
+                                        "name": "Alberto Inácio",
+                                        "description": "Gerente de produto e inovação."
+                                    }
+                                ]
+                                """;
+
+                assertThat(response).isEqualToIgnoringWhitespace(expectedResponse).as(description);
+        }
+
+        @Test
+        @DisplayName("Deve retornar 200 - OK quando o name é encontrado parcialmente")
+        void shouldReturnOkWhenNameIsFoundPartially() throws Exception {
+                final var description = "Name: nome encontrado parcialmente";
+                final var name = "Alb";
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("name", name);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isOk())
+                                .andReturn().getResponse().getContentAsString();
+
+                final String expectedResponse = """
+                                [
+                                    {
+                                        "id": "019a9ea9-5161-7000-03f1-098e3277407e",
+                                        "name": "Alberto Inácio",
+                                        "description": "Gerente de produto e inovação."
+                                    }
+                                ]
+                                """;
+
+                assertThat(response).isEqualToIgnoringWhitespace(expectedResponse).as(description);
+        }
+
+        @Test
+        @DisplayName("Deve retornar 200 - OK quando o name é encontrado com limit customizado")
+        void shouldReturnOkWhenNameIsFoundWithCustomLimit() throws Exception {
+                final var description = "Name: nome encontrado com limit customizado";
+                final var name = "Ana";
+                final var limit = "3";
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("name", name)
+                                .queryParam("limit", limit);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isOk())
+                                .andReturn().getResponse().getContentAsString();
+
+                final String expectedResponse = """
+                                [
+                                        {
+                                                "id": "019b248e-a961-7000-233d-b99937ef11d4",
+                                                "name": "Ana Isidoro",
+                                                "description": "Especialista em segurança de aplicações."
+                                        },
+                                        {
+                                                "id": "019926b9-1561-7000-6090-c113559eb471",
+                                                "name": "Diana Fernandes",
+                                                "description": "Especialista em e-commerce e vendas."
+                                        },
+                                        {
+                                                "id": "019acd02-8d61-7000-dc08-f222fa8c30f4",
+                                                "name": "Juliana Rios",
+                                                "description": "Estudante de ciência de dados."
+                                        }
+                                ]
+                                """;
+
+                assertThat(response).isEqualToIgnoringWhitespace(expectedResponse).as(description);
+        }
+
+        @Test
+        @DisplayName("Deve retornar erro 404 - NOT_FOUND quando o name não é encontrado")
+        void shouldReturnNotFoundWhenNameIsNotFound() throws Exception {
+                final var description = "Name: nome não encontrado";
+                final var name = "NomeInexistente";
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("name", name);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isNotFound())
+                                .andReturn().getResponse().getContentAsString();
+
+                assertThat(response).isBlank().as(description);
+        }
+
+        @Test
+        @DisplayName("Deve retornar 200 - OK quando o name é encontrado com paginação por lastSeenName e lastSeenId")
+        void shouldReturnOkWhenNameIsFoundWithPagination() throws Exception {
+                final var description = "Name: nome encontrado com paginação";
+                final var name = "Ana";
+                final var lastSeenName = "Juliana Rios";
+                final var lastSeenId = "019acd02-8d61-7000-dc08-f222fa8c30f4";
+                final var limit = "3";
+
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("name", name)
+                                .queryParam("lastSeenName", lastSeenName)
+                                .queryParam("lastSeenId", lastSeenId)
+                                .queryParam("limit", limit);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isOk())
+                                .andReturn().getResponse().getContentAsString();
+
+                final String expectedResponse = """
+                                [
+                                        {
+                                                "id": "0199d5d1-4d61-7000-18f0-9689e06c1745",
+                                                "name": "Mariana Paz",
+                                                "description": "Estudante de engenharia de dados."
+                                        },
+                                        {
+                                                "id": "019a7050-1561-7000-762c-4de2f6a38808",
+                                                "name": "Renata Yamanaka",
+                                                "description": "Analista de dados e ciência de dados."
+                                        },
+                                        {
+                                                "id": "01997e45-3161-7000-4774-f18b86a14137",
+                                                "name": "Vitor Viana",
+                                                "description": "Consultor financeiro e investidor."
+                                        }
+                                ]
+                                """;
+
+                assertThat(response).isEqualToIgnoringWhitespace(expectedResponse).as(description);
+        }
+
+        @Test
+        @DisplayName("Deve retornar 400 - BAD_REQUEST quando o lastSeenId não é informado ao lastSeenName estar presente")
+        void shouldReturnBadRequestWhenWithoutLastSeenIdWithLastSeenNamePresent() throws Exception {
+                final var description = "Name: nome encontrado com paginação por lastSeenName apenas";
+                final var name = "Maria";
+                final var lastSeenName = "Maria Silva";
+
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("name", name)
+                                .queryParam("lastSeenName", lastSeenName);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isBadRequest())
+                                .andReturn().getResponse().getContentAsString();
+
+                final String expectedResponse = """
+                                {
+                                        "lastSeenId": [
+                                                "não deve ser nulo"
+                                        ]
+                                }
+                                """;
+
+                assertThat(response).isEqualToIgnoringWhitespace(expectedResponse).as(description);
+        }
+
+        @Test
+        @DisplayName("Deve retornar 400 - BAD_REQUEST quando o lastSeenName não é informado ao lastSeenId estar presente")
+        void shouldReturnBadRequestWhenWithoutLastSeenNameWithLastSeenIdPresent() throws Exception {
+                final var description = "Name: nome encontrado com paginação por lastSeenId apenas";
+                final var name = "Ana";
+                final var lastSeenId = "019a9ea9-5161-7000-03f1-098e327740aa";
+
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("name", name)
+                                .queryParam("lastSeenId", lastSeenId);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isBadRequest())
+                                .andReturn().getResponse().getContentAsString();
+
+                final String expectedResponse = """
+                                {
+                                        "lastSeenName": [
+                                                "não deve ser nulo"
+                                        ]
+                                }
+                                """;
+
+                assertThat(response).isEqualToIgnoringWhitespace(expectedResponse).as(description);
+        }
+
+        @Test
+        @DisplayName("Deve retornar erro 404 - NOT_FOUND quando o name não é encontrado com paginação")
+        void shouldReturnNotFoundWhenNameIsNotFoundWithPagination() throws Exception {
+                final var description = "Name: nome não encontrado com paginação";
+                final var name = "NomeInexistente";
+                final var lastSeenName = "Último Nome";
+                final var lastSeenId = "019a9ea9-5161-7000-03f1-098e327740cc";
+
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("name", name)
+                                .queryParam("lastSeenName", lastSeenName)
+                                .queryParam("lastSeenId", lastSeenId);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isNotFound())
+                                .andReturn().getResponse().getContentAsString();
+
+                assertThat(response).isBlank().as(description);
+        }
+
+        @Test
+        @DisplayName("Deve retornar erro 400 - BAD_REQUEST quando lastSeenId é inválido na busca com paginação")
+        void shouldReturnBadRequestWhenLastSeenIdIsInvalidWithPagination() throws Exception {
+                final var description = "Name: lastSeenId inválido na busca com paginação";
+                final var name = "João";
+                final var lastSeenName = "João Silva";
+                final var invalidLastSeenId = "id-inválido";
+
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("name", name)
+                                .queryParam("lastSeenName", lastSeenName)
+                                .queryParam("lastSeenId", invalidLastSeenId);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isBadRequest())
+                                .andReturn().getResponse().getContentAsString();
+
+                final String expectedResponse = """
+                                {
+                                    "lastSeenId": [
+                                        "deve pertencer ao tipo UUID"
+                                    ]
+                                }
+                                """;
+
+                assertThat(response).isEqualToIgnoringWhitespace(expectedResponse).as(description);
+        }
+
+        @ParameterizedTest
+        @ValueSource(ints = { 0, -1, -10 })
+        @DisplayName("Deve retornar erro 400 - BAD_REQUEST quando limit é inválido na busca por nome")
+        void shouldReturnBadRequestWhenLimitIsInvalid(final int invalidLimit) throws Exception {
+                final var description = "Name: limit inválido (" + invalidLimit + ")";
+                final var name = "João";
+
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("name", name)
+                                .queryParam("limit", String.valueOf(invalidLimit));
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isBadRequest())
+                                .andReturn().getResponse().getContentAsString();
+
+                final String expectedResponse = """
+                                {
+                                    "limit": [
+                                        "deve ser maior que 0"
+                                    ]
+                                }
+                                """;
+
+                assertThat(response).isEqualToIgnoringWhitespace(expectedResponse).as(description);
+        }
+
 }
