@@ -64,6 +64,6 @@ public class ProfileController {
 
 /*
  * 1. Criar cache redis.
- * 2. Testar individualmente cada parâmetro do método get. (levantar casos de
- * teste usando o service)
+ * 2. Criar um valor máximo para o limit de paginação.
+ * 3. Configurar a paginação do SpringBoot.
  */
