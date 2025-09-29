@@ -65,5 +65,4 @@ public class ProfileController {
 /*
  * 1. Criar um valor máximo para o limit de paginação.
  * 2. Variáveis de ambiente internas devem ser constantes.
- * 3. Testar execução em ambiente de máquina real.
  */

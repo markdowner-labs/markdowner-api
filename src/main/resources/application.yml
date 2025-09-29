@@ -40,6 +40,5 @@ spring:
     type: redis
     redis:
       time-to-live: ${SPRINGBOOT_CACHE_REDIS_TIME_TO_LIVE}
-      cache-null-values: false
       key-prefix: "markdowner_api:"
       use-key-prefix: true
