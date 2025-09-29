@@ -950,4 +950,51 @@ public class ProfileControllerTest {
                 assertThat(response).isEqualToIgnoringWhitespace(expectedResponse).as(description);
         }
 
+        @ParameterizedTest
+        @CsvSource(value = {
+                        "Nome: número no valor;João123",
+                        "Nome: caractere inválido '!';Maria!",
+                        "Nome: caractere inválido '@';José@Silva",
+                        "Nome: caractere inválido '_';Ana_Souza",
+                        "Nome: dois espaços consecutivos;João  Silva",
+                        "Nome: dois hífens consecutivos;Ana--Clara",
+                        "Nome: dois apóstrofos consecutivos;O''Neill",
+                        "Nome: hífen no final;Pedro-",
+                        "Nome: apóstrofo no final;Luiz'",
+                        "Nome: apenas hífen;-",
+                        "Nome: apenas apóstrofo;'",
+                        "Nome: letra fora do intervalo permitido (estilizada);𝓙𝓸𝓼é",
+                        "Nome: letra fora do intervalo permitido (turca);İlker",
+                        "Nome: letra fora do intervalo permitido (polonesa);Łukasz",
+                        "Nome: ponto antes de leta;.Pedro Alvares Cabral",
+                        "Nome: ponto entre espaços;Pedro . Alvares Cabral",
+                        "Nome: ponto após espaço;Pedro .Alvares Cabral"
+        }, delimiter = ';')
+        @DisplayName("Deve retornar erro 400 - BAD_REQUEST quando lastSeenName é inválido na busca paginada")
+        void shouldReturnBadRequestWhenLastSeenNameIsInvalidInPaginated(final String description, final String invalidLastSeenName) throws Exception {
+                final var limit = "10";
+                final var lastSeenId = "019a9ea9-5161-7000-03f1-098e3277407e";
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("limit", limit)
+                                .queryParam("lastSeenName", invalidLastSeenName)
+                                .queryParam("lastSeenId", lastSeenId);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isBadRequest())
+                                .andReturn().getResponse().getContentAsString();
+
+                final String expectedResponse = """
+                                {
+                                        "lastSeenName": [
+                                                "deve ser um nome bem formado"
+                                        ]
+                                }
+                                """;
+
+                assertThat(response).isEqualToIgnoringWhitespace(expectedResponse).as(description);
+        }
+
 }
