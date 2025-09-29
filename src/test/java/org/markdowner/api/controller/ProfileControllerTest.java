@@ -713,4 +713,241 @@ public class ProfileControllerTest {
                 assertThat(response).isEqualToIgnoringWhitespace(expectedResponse).as(description);
         }
 
+        @Test
+        @DisplayName("Deve retornar 200 - OK quando buscar todos os perfis com limite padrão")
+        void shouldReturnOkWhenFindAllWithDefaultLimit() throws Exception {
+                final var description = "FindAll: buscar todos com limite padrão (100)";
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isOk())
+                                .andReturn().getResponse().getContentAsString();
+
+                assertThat(response).isEqualToIgnoringWhitespace(profilePathResponseBody).as(description);
+        }
+
+        @Test
+        @DisplayName("Deve retornar 200 - OK quando buscar todos os perfis com limite customizado")
+        void shouldReturnOkWhenFindAllWithCustomLimit() throws Exception {
+                final var description = "FindAll: buscar todos com limite customizado (50)";
+                final var limit = "3";
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("limit", limit);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isOk())
+                                .andReturn().getResponse().getContentAsString();
+
+                final String expectedResponse = """
+                                [
+                                        {
+                                                "id": "019a9ea9-5161-7000-03f1-098e3277407e",
+                                                "name": "Alberto Inácio",
+                                                "description": "Gerente de produto e inovação."
+                                        },
+                                        {
+                                                "id": "01989bad-6161-7000-0ae9-f440b10578ec",
+                                                "name": "Alice Alves",
+                                                "description": "Uma pessoa criativa e dedicada."
+                                        },
+                                        {
+                                                "id": "01999804-fd61-7000-7c85-7376e99e6b3f",
+                                                "name": "Aline Castro",
+                                                "description": "Analista de sistemas e DevOps."
+                                        }
+                                ]
+                                """;
+
+                assertThat(response).isEqualToIgnoringWhitespace(expectedResponse).as(description);
+        }
+
+        @ParameterizedTest
+        @CsvSource(value = {
+                        "FindAll: limite inválido (zero);0;deve ser maior que 0",
+                        "FindAll: limite inválido (negativo);-10;deve ser maior que 0",
+                        "FindAll: limite inválido (não numérico);abc;deve pertencer ao tipo int"
+        }, delimiter = ';')
+        @DisplayName("Deve retornar erro 400 - BAD_REQUEST quando o limite é inválido")
+        void shouldReturnBadRequestWhenLimitIsInvalid(final String description, final String limit, final String expected) throws Exception {
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("limit", limit);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isBadRequest())
+                                .andReturn().getResponse().getContentAsString();
+
+                final String expectedResponse = """
+                                {
+                                    "limit": [
+                                        """ + "\"" + expected + "\"" + """
+                                    ]
+                                }
+                                """;
+
+                assertThat(response).isEqualToIgnoringWhitespace(expectedResponse).as(description);
+        }
+
+        @Test
+        @DisplayName("Deve retornar 200 - OK quando buscar todos os perfis com paginação válida")
+        void shouldReturnOkWhenFindAllWithValidPagination() throws Exception {
+                final var description = "FindAll com paginação: parâmetros válidos";
+                final var limit = "2";
+                final var lastSeenName = "Alberto Inácio";
+                final var lastSeenId = "019a9ea9-5161-7000-03f1-098e3277407e";
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("limit", limit)
+                                .queryParam("lastSeenName", lastSeenName)
+                                .queryParam("lastSeenId", lastSeenId);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isOk())
+                                .andReturn().getResponse().getContentAsString();
+
+                final String expectedResponse = """
+                                [
+                                        {
+                                                "id": "01989bad-6161-7000-0ae9-f440b10578ec",
+                                                "name": "Alice Alves",
+                                                "description": "Uma pessoa criativa e dedicada."
+                                        },
+                                        {
+                                                "id": "01999804-fd61-7000-7c85-7376e99e6b3f",
+                                                "name": "Aline Castro",
+                                                "description": "Analista de sistemas e DevOps."
+                                        }
+                                ]
+                                """;
+
+                assertThat(response).isEqualToIgnoringWhitespace(expectedResponse).as(description);
+        }
+
+        @Test
+        @DisplayName("Deve retornar 400 - BAD_REQUEST quando buscar com apenas lastSeenName preenchido")
+        void shouldReturnBadRequestWhenFindAllWithOnlyLastSeenName() throws Exception {
+                final var description = "FindAll com paginação: apenas lastSeenName preenchido";
+                final var limit = "10";
+                final var lastSeenName = "Alberto Inácio";
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("limit", limit)
+                                .queryParam("lastSeenName", lastSeenName);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isBadRequest())
+                                .andReturn().getResponse().getContentAsString();
+
+                final String expectedResponse = """
+                                {
+                                        "lastSeenId": [
+                                                "não deve ser nulo"
+                                        ]
+                                }
+                                """;
+
+                assertThat(response).isEqualToIgnoringWhitespace(expectedResponse).as(description);
+        }
+
+        @Test
+        @DisplayName("Deve retornar 400 - BAD_REQUEST quando buscar com apenas lastSeenId preenchido")
+        void shouldReturnBadRequestWhenFindAllWithOnlyLastSeenId() throws Exception {
+                final var description = "FindAll com paginação: apenas lastSeenId preenchido";
+                final var limit = "10";
+                final var lastSeenId = "019a9ea9-5161-7000-03f1-098e3277407e";
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("limit", limit)
+                                .queryParam("lastSeenId", lastSeenId);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isBadRequest())
+                                .andReturn().getResponse().getContentAsString();
+
+                final String expectedResponse = """
+                                {
+                                        "lastSeenName": [
+                                                "não deve ser nulo"
+                                        ]
+                                }
+                                """;
+
+                assertThat(response).isEqualToIgnoringWhitespace(expectedResponse).as(description);
+        }
+
+        @ParameterizedTest
+        @CsvSource(value = {
+                        "FindAll com paginação: limite inválido (zero);0;Alberto Inácio;019a9ea9-5161-7000-03f1-098e3277407e",
+                        "FindAll com paginação: limite inválido (negativo);-5;Alberto Inácio;019a9ea9-5161-7000-03f1-098e3277407e"
+        }, delimiter = ';')
+        @DisplayName("Deve retornar erro 400 - BAD_REQUEST quando o limite é inválido na paginação")
+        void shouldReturnBadRequestWhenLimitIsInvalidWithPagination(final String description, final String limit,
+                        final String lastSeenName, final String lastSeenId) throws Exception {
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("limit", limit)
+                                .queryParam("lastSeenName", lastSeenName)
+                                .queryParam("lastSeenId", lastSeenId);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isBadRequest())
+                                .andReturn().getResponse().getContentAsString();
+
+                final String expectedResponse = """
+                                {
+                                    "limit": [
+                                        "deve ser maior que 0"
+                                    ]
+                                }
+                                """;
+
+                assertThat(response).isEqualToIgnoringWhitespace(expectedResponse).as(description);
+        }
+
+        @Test
+        @DisplayName("Deve retornar erro 400 - BAD_REQUEST quando lastSeenId é inválido")
+        void shouldReturnBadRequestWhenLastSeenIdIsInvalid() throws Exception {
+                final var description = "FindAll com paginação: lastSeenId inválido (não é UUID)";
+                final var limit = "10";
+                final var lastSeenName = "Alberto Inácio";
+                final var lastSeenId = "invalid-uuid";
+                final var request = MockMvcRequestBuilders
+                                .get(Routes.PROFILE)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("limit", limit)
+                                .queryParam("lastSeenName", lastSeenName)
+                                .queryParam("lastSeenId", lastSeenId);
+
+                final var response = mockMvc.perform(request)
+                                .andExpect(status().isBadRequest())
+                                .andReturn().getResponse().getContentAsString();
+
+                final String expectedResponse = """
+                                {
+                                    "lastSeenId": [
+                                        "deve pertencer ao tipo UUID"
+                                    ]
+                                }
+                                """;
+
+                assertThat(response).isEqualToIgnoringWhitespace(expectedResponse).as(description);
+        }
+
 }
