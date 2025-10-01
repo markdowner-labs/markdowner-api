@@ -63,6 +63,5 @@ public class ProfileController {
 }
 
 /*
- * 1. Criar um valor máximo para o limit de paginação.
- * 2. Variáveis de ambiente internas devem ser constantes.
+ * 1. Testar o uso de limit nas camadas de serviço e controle
  */

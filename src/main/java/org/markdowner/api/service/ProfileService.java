@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.markdowner.api.domain.model.Profile;
+import org.markdowner.api.domain.validation.Limit;
 import org.markdowner.api.domain.validation.profile.Email;
 import org.markdowner.api.domain.validation.profile.Name;
 import org.markdowner.api.repository.ProfileRepository;
@@ -13,7 +14,6 @@ import org.springframework.validation.annotation.Validated;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 
 @Validated
@@ -31,25 +31,25 @@ public class ProfileService {
         return repository.findByEmail(email);
     }
 
-    public List<Profile> findAll(final @Positive int limit) {
+    public List<Profile> findAll(final @Limit Integer limit) {
         return repository.findAll(limit);
     }
 
     public List<Profile> findAll(
-            final @Positive int limit,
+            final @Limit Integer limit,
             final @Name String lastSeenName,
             final @NotNull UUID lastSeenId) {
         return repository.findAll(limit, lastSeenName, lastSeenId);
     }
 
     public List<Profile> findByNameContainingIgnoreCase(
-            final @Positive int limit,
+            final @Limit Integer limit,
             final @NotBlank String name) {
         return repository.findByNameContainingIgnoreCase(limit, name);
     }
 
     public List<Profile> findByNameContainingIgnoreCase(
-            final @Positive int limit,
+            final @Limit Integer limit,
             final @Name String lastSeenName,
             final @NotNull UUID lastSeenId,
             final @NotBlank String name) {
