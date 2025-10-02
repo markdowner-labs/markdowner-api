@@ -2,6 +2,9 @@ package org.markdowner.api.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -18,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.markdowner.api.domain.model.Profile;
 import org.markdowner.api.repository.ProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,7 +119,7 @@ public class ProfileServiceTest {
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 final var expected = List.of("deve ser um endereço de e-mail bem formado");
                 assertThat(validations).isEqualTo(expected).as(description);
-                verify(repository, never().description(description)).findByEmail(email);
+                verify(repository, never().description(description)).findByEmail(anyString());
         }
 
         @Test
@@ -127,7 +131,7 @@ public class ProfileServiceTest {
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 final var expected = List.of("não deve ser nulo");
                 assertThat(validations).isEqualTo(expected).as(description);
-                verify(repository, never().description(description)).findByEmail(null);
+                verify(repository, never().description(description)).findByEmail(anyString());
         }
 
         @ParameterizedTest(name = "{0}")
@@ -139,8 +143,7 @@ public class ProfileServiceTest {
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 final var expected = List.of("deve ser um nome bem formado");
                 assertThat(validations).isEqualTo(expected).as(description);
-                verify(repository, never().description(description))
-                                .findByNameContainingIgnoreCase(1, name, UUID.randomUUID(), "any_name");
+                verify(repository, never().description(description)).findByNameContainingIgnoreCase(anyInt(), anyString(), any(UUID.class), anyString());
         }
 
         @Test
@@ -153,8 +156,7 @@ public class ProfileServiceTest {
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 final var expected = List.of("deve conter no máximo 30 caracteres");
                 assertThat(validations).isEqualTo(expected).as(description);
-                verify(repository, never().description(description))
-                                .findByNameContainingIgnoreCase(1, longSizeName, UUID.randomUUID(), "any_name");
+                verify(repository, never().description(description)).findByNameContainingIgnoreCase(anyInt(), anyString(), any(UUID.class), anyString());
         }
 
         @ParameterizedTest(name = "{0}")
@@ -164,15 +166,15 @@ public class ProfileServiceTest {
                 var validations = assertThrows(ConstraintViolationException.class, () -> {
                         service.findByNameContainingIgnoreCase(limit, "P. Alvares Cabral", UUID.randomUUID(), "any_name");
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
-                final var expected = List.of("deve ser maior que 0");
+                final var expected = List.of("deve ser um número positivo menor ou igual à 100");
                 assertThat(validations).isEqualTo(expected).as(description);
-                verify(repository, never().description(description)).findByNameContainingIgnoreCase(limit, "P. Alvares Cabral", UUID.randomUUID(), "any_name");
+                verify(repository, never().description(description)).findByNameContainingIgnoreCase(anyInt(), anyString(), any(UUID.class), anyString());
 
                 validations = assertThrows(ConstraintViolationException.class, () -> {
                         service.findByNameContainingIgnoreCase(limit, "any name");
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 assertThat(validations).isEqualTo(expected).as(description);
-                verify(repository, never().description(description)).findByNameContainingIgnoreCase(limit, "any name");
+                verify(repository, never().description(description)).findByNameContainingIgnoreCase(anyInt(), anyString());
         }
 
         @Test
@@ -184,7 +186,7 @@ public class ProfileServiceTest {
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 final var expected = List.of("não deve ser nulo");
                 assertThat(validations).isEqualTo(expected).as(description);
-                verify(repository, never().description(description)).findByNameContainingIgnoreCase(1, "Pedro A. Cabral", null, "any_name");
+                verify(repository, never().description(description)).findByNameContainingIgnoreCase(anyInt(), anyString(), any(UUID.class), anyString());
         }
 
         @Test
@@ -196,13 +198,13 @@ public class ProfileServiceTest {
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 final var expected = List.of("não deve estar em branco");
                 assertThat(validations).isEqualTo(expected).as(description);
-                verify(repository, never().description(description)).findByNameContainingIgnoreCase(1, "Pedro Alvares C.", UUID.randomUUID(), null);
+                verify(repository, never().description(description)).findByNameContainingIgnoreCase(anyInt(), anyString(), any(UUID.class), anyString());
 
                 validations = assertThrows(ConstraintViolationException.class, () -> {
                         service.findByNameContainingIgnoreCase(1, null);
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 assertThat(validations).isEqualTo(expected).as(description);
-                verify(repository, never().description(description)).findByNameContainingIgnoreCase(1, null);
+                verify(repository, never().description(description)).findByNameContainingIgnoreCase(anyInt(), anyString());
         }
 
         @Test
@@ -214,7 +216,7 @@ public class ProfileServiceTest {
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 final var expected = List.of("não deve ser nulo");
                 assertThat(validations).isEqualTo(expected).as(description);
-                verify(repository, never().description(description)).findByNameContainingIgnoreCase(1, null, UUID.randomUUID(), "any_name");
+                verify(repository, never().description(description)).findByNameContainingIgnoreCase(anyInt(), anyString(), any(UUID.class), anyString());
         }
 
         @Test
@@ -223,7 +225,7 @@ public class ProfileServiceTest {
                 final var profile = profile();
                 when(repository.findByEmail(profile.getEmail())).thenReturn(Optional.of(profile));
                 assertThat(service.findByEmail(profile.getEmail())).isEqualTo(Optional.of(profile));
-                verify(repository, times(1)).findByEmail(profile.getEmail());
+                verify(repository, times(1)).findByEmail(anyString());
         }
 
         @Test
@@ -233,14 +235,13 @@ public class ProfileServiceTest {
 
                 when(repository.findByNameContainingIgnoreCase(10, profile.getName())).thenReturn(List.of(profile));
                 assertThat(service.findByNameContainingIgnoreCase(10, profile.getName())).isEqualTo(List.of(profile));
-                verify(repository, times(1)).findByNameContainingIgnoreCase(10, profile.getName());
+                verify(repository, times(1)).findByNameContainingIgnoreCase(anyInt(), anyString());
 
                 when(repository.findByNameContainingIgnoreCase(10, profile.getName(), profile.getId(), profile.getName())).thenReturn(List.of(profile));
                 assertThat(service.findByNameContainingIgnoreCase(10, profile.getName(), profile.getId(), profile.getName())).isEqualTo(List.of(profile));
-                verify(repository, times(1)).findByNameContainingIgnoreCase(10, profile.getName(), profile.getId(), profile.getName());
+                verify(repository, times(1)).findByNameContainingIgnoreCase(anyInt(), anyString(), any(UUID.class), anyString());
         }
 
-        @SuppressWarnings("null")
         @Test
         @DisplayName("Validação do campo id - caso nulo")
         public void shouldRejectNullIdTest() {
@@ -251,7 +252,7 @@ public class ProfileServiceTest {
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 final var expected = List.of("não deve ser nulo");
                 assertThat(validations).isEqualTo(expected).as(description);
-                verify(repository, never().description(description)).findById(nullId);
+                verify(repository, never().description(description)).findById(any(UUID.class));
         }
 
         @Test
@@ -260,7 +261,7 @@ public class ProfileServiceTest {
                 final var profile = profile();
                 when(repository.findById(profile.getId())).thenReturn(Optional.of(profile));
                 assertThat(service.findById(profile.getId())).isEqualTo(Optional.of(profile));
-                verify(repository, times(1)).findById(profile.getId());
+                verify(repository, times(1)).findById(any(UUID.class));
         }
 
         @Test
@@ -269,7 +270,7 @@ public class ProfileServiceTest {
                 final var id = UUID.randomUUID();
                 when(repository.findById(id)).thenReturn(Optional.empty());
                 assertThat(service.findById(id)).isEmpty();
-                verify(repository, times(1)).findById(id);
+                verify(repository, times(1)).findById(any(UUID.class));
         }
 
         @ParameterizedTest(name = "{0}")
@@ -279,15 +280,15 @@ public class ProfileServiceTest {
                 var validations = assertThrows(ConstraintViolationException.class, () -> {
                         service.findAll(limit);
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
-                final var expected = List.of("deve ser maior que 0");
+                final var expected = List.of("deve ser um número positivo menor ou igual à 100");
                 assertThat(validations).isEqualTo(expected).as(description);
-                verify(repository, never().description(description)).findAll(limit);
+                verify(repository, never().description(description)).findAll(anyInt());
 
                 validations = assertThrows(ConstraintViolationException.class, () -> {
                         service.findAll(limit, "P. Dias D'Ávila São M.", UUID.randomUUID());
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 assertThat(validations).isEqualTo(expected).as(description);
-                verify(repository, never().description(description)).findAll(limit, "P. Dias D'Ávila São M.", UUID.randomUUID());
+                verify(repository, never().description(description)).findAll(anyInt(), anyString(), any(UUID.class));
         }
 
         @ParameterizedTest(name = "{0}")
@@ -299,7 +300,7 @@ public class ProfileServiceTest {
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 final var expected = List.of("deve ser um nome bem formado");
                 assertThat(validations).isEqualTo(expected).as(description);
-                verify(repository, never().description(description)).findAll(1, name, UUID.randomUUID());
+                verify(repository, never().description(description)).findAll(anyInt(), anyString(), any(UUID.class));
         }
 
         @Test
@@ -311,7 +312,7 @@ public class ProfileServiceTest {
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 final var expected = List.of("não deve ser nulo");
                 assertThat(validations).isEqualTo(expected).as(description);
-                verify(repository, never().description(description)).findAll(1, "P. Dias D'Ávila São M.", null);
+                verify(repository, never().description(description)).findAll(anyInt(), anyString(), any(UUID.class));
         }
 
         @Test
@@ -324,7 +325,7 @@ public class ProfileServiceTest {
                 }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
                 final var expected = List.of("deve conter no máximo 30 caracteres");
                 assertThat(validations).isEqualTo(expected).as(description);
-                verify(repository, never().description(description)).findAll(1, longSizeName, UUID.randomUUID());
+                verify(repository, never().description(description)).findAll(anyInt(), anyString(), any(UUID.class));
         }
 
         @Test
@@ -333,10 +334,110 @@ public class ProfileServiceTest {
                 final var profile = profile();
                 when(repository.findAll(10)).thenReturn(List.of(profile));
                 assertThat(service.findAll(10)).isEqualTo(List.of(profile));
-                verify(repository, times(1)).findAll(10);
+                verify(repository, times(1)).findAll(anyInt());
                 when(repository.findAll(10, profile.getName(), profile.getId())).thenReturn(List.of(profile));
                 assertThat(service.findAll(10, profile.getName(), profile.getId())).isEqualTo(List.of(profile));
-                verify(repository, times(1)).findAll(10, profile.getName(), profile.getId());
+                verify(repository, times(1)).findAll(anyInt(), anyString(), any(UUID.class));
+        }
+
+        @Test
+        @DisplayName("Validação do campo limit em findAll - caso nulo")
+        public void shouldRejectNullLimitInFindAll() {
+                final var description = "limit: está nulo";
+                var validations = assertThrows(ConstraintViolationException.class, () -> {
+                        service.findAll(null, "P. Dias D'Ávila São M.", UUID.randomUUID());
+                }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                final var expected = List.of("não deve ser nulo");
+                assertThat(validations).isEqualTo(expected).as(description);
+                verify(repository, never().description(description)).findAll(anyInt(), anyString(), any(UUID.class));
+        }
+
+        @Test
+        @DisplayName("Validação do campo limit em findAll primeira paginação - caso nulo")
+        public void shouldRejectNullLimitInFindAllFirstPagination() {
+                final var description = "limit: está nulo";
+                var validations = assertThrows(ConstraintViolationException.class, () -> {
+                        service.findAll(null);
+                }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                final var expected = List.of("não deve ser nulo");
+                assertThat(validations).isEqualTo(expected).as(description);
+                verify(repository, never().description(description)).findAll(anyInt());
+        }
+
+        @ParameterizedTest
+        @ValueSource(ints = { -1, 0, 101 })
+        @DisplayName("Validação do campo limit em findAll - caso inválido")
+        public void shouldRejectInvalidValuesLimitInFindAll(final int invalidLimit) {
+                final var description = "limit: está inválido";
+                var validations = assertThrows(ConstraintViolationException.class, () -> {
+                        service.findAll(invalidLimit, "P. Dias D'Ávila São M.", UUID.randomUUID());
+                }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                final var expected = List.of("deve ser um número positivo menor ou igual à 100");
+                assertThat(validations).isEqualTo(expected).as(description);
+                verify(repository, never().description(description)).findAll(anyInt(), anyString(),  any(UUID.class));
+        }
+
+        @ParameterizedTest
+        @ValueSource(ints = { -1, 0, 101 })
+        @DisplayName("Validação do campo limit em findAll primeira paginação - caso inválido")
+        public void shouldRejectInvalidValuesLimitInFindAllFirstPagination(final int invalidLimit) {
+                final var description = "limit: está inválido";
+                var validations = assertThrows(ConstraintViolationException.class, () -> {
+                        service.findAll(invalidLimit);
+                }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                final var expected = List.of("deve ser um número positivo menor ou igual à 100");
+                assertThat(validations).isEqualTo(expected).as(description);
+                verify(repository, never().description(description)).findAll(anyInt());
+        }
+
+        @Test
+        @DisplayName("Validação do campo limit em findByNameContainingIgnoreCase - caso nulo")
+        public void shouldRejectNullLimitInFindByNameContainingIgnoreCase() {
+                final var description = "limit: está nulo";
+                var validations = assertThrows(ConstraintViolationException.class, () -> {
+                        service.findByNameContainingIgnoreCase(null, "João");
+                }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                final var expected = List.of("não deve ser nulo");
+                assertThat(validations).isEqualTo(expected).as(description);
+                verify(repository, never().description(description)).findByNameContainingIgnoreCase(anyInt(), anyString());
+        }
+
+        @ParameterizedTest
+        @ValueSource(ints = { -1, 0, 101 })
+        @DisplayName("Validação do campo limit em findByNameContainingIgnoreCase - caso inválido")
+        public void shouldRejectInvalidValuesLimitInFindByNameContainingIgnoreCase(final int invalidLimit) {
+                final var description = "limit: está inválido";
+                var validations = assertThrows(ConstraintViolationException.class, () -> {
+                        service.findByNameContainingIgnoreCase(invalidLimit, "João");
+                }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                final var expected = List.of("deve ser um número positivo menor ou igual à 100");
+                assertThat(validations).isEqualTo(expected).as(description);
+                verify(repository, never().description(description)).findByNameContainingIgnoreCase(anyInt(), anyString());
+        }
+
+        @Test
+        @DisplayName("Validação do campo limit em findByNameContainingIgnoreCase com paginação - caso nulo")
+        public void shouldRejectNullLimitInFindByNameContainingIgnoreCaseWithPagination() {
+                final var description = "limit: está nulo";
+                var validations = assertThrows(ConstraintViolationException.class, () -> {
+                        service.findByNameContainingIgnoreCase(null, "P. Dias D'Ávila São M.", UUID.randomUUID(), "João");
+                }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                final var expected = List.of("não deve ser nulo");
+                assertThat(validations).isEqualTo(expected).as(description);
+                verify(repository, never().description(description)).findByNameContainingIgnoreCase(anyInt(), anyString(), any(UUID.class), anyString());
+        }
+
+        @ParameterizedTest
+        @ValueSource(ints = { -1, 0, 101 })
+        @DisplayName("Validação do campo limit em findByNameContainingIgnoreCase com paginação - caso inválido")
+        public void shouldRejectInvalidValuesLimitInFindByNameContainingIgnoreCaseWithPagination(final int invalidLimit) {
+                final var description = "limit: está inválido";
+                var validations = assertThrows(ConstraintViolationException.class, () -> {
+                        service.findByNameContainingIgnoreCase(invalidLimit, "P. Dias D'Ávila São M.", UUID.randomUUID(), "João");
+                }, description).getConstraintViolations().stream().map(ConstraintViolation::getMessage);
+                final var expected = List.of("deve ser um número positivo menor ou igual à 100");
+                assertThat(validations).isEqualTo(expected).as(description);
+                verify(repository, never().description(description)).findByNameContainingIgnoreCase(anyInt(), anyString(), any(UUID.class), anyString());
         }
 
 }
