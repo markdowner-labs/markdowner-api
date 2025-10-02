@@ -61,7 +61,3 @@ public class ProfileController {
     }
 
 }
-
-/*
- * STABLE, UNSTABLE, TESTER, DEVELOPER
- */
