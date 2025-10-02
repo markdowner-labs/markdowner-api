@@ -610,7 +610,7 @@ public class ProfileControllerTest {
                 final String expectedResponse = """
                                 {
                                     "limit": [
-                                        "deve ser maior que 0"
+                                        "deve ser um número positivo menor ou igual à 100"
                                     ]
                                 }
                                 """;
@@ -769,8 +769,8 @@ public class ProfileControllerTest {
 
         @ParameterizedTest
         @CsvSource(value = {
-                        "FindAll: limite inválido (zero);0;deve ser maior que 0",
-                        "FindAll: limite inválido (negativo);-10;deve ser maior que 0",
+                        "FindAll: limite inválido (zero);0;deve ser um número positivo menor ou igual à 100",
+                        "FindAll: limite inválido (negativo);-10;deve ser um número positivo menor ou igual à 100",
                         "FindAll: limite inválido (não numérico);abc;deve pertencer ao tipo int"
         }, delimiter = ';')
         @DisplayName("Deve retornar erro 400 - BAD_REQUEST quando o limite é inválido")
@@ -912,7 +912,7 @@ public class ProfileControllerTest {
                 final String expectedResponse = """
                                 {
                                     "limit": [
-                                        "deve ser maior que 0"
+                                        "deve ser um número positivo menor ou igual à 100"
                                     ]
                                 }
                                 """;
