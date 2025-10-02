@@ -63,5 +63,5 @@ public class ProfileController {
 }
 
 /*
- * 1. Testar o uso de limit nas camadas de serviço e controle
+ * STABLE, UNSTABLE, TESTER, DEVELOPER
  */
